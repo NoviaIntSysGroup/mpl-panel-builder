@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "mpl-panel-builder"
+version = "0.0.0"  # Placeholder, overridden by git tag
+description = "Matplotlib based figure panel builder"
+authors = ["Johan Westö <johan.westo@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "mpl_panel_builder", from = "src" }]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.14"
+matplotlib = "^3.10.3"
+
+[tool.poetry.group.notebook.dependencies]
+ipykernel = "^6.29.5"
+pyyaml = "^6.0.2"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.13"
+mypy = "^1.16.0"
+types-pyyaml = "^6.0.12.20250516"
+pre-commit = "^4.2.0"
+
+[tool.mypy]
+strict = true
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+select = ["E", "F", "I", "B", "N", "UP", "C4", "T20", "A"]
+ignore = ["E203"]
+fix = true
+
+[tool.poetry-dynamic-versioning]
+enable = true
+
+[build-system]
+requires = ["poetry-core", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"

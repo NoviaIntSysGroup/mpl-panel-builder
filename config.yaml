@@ -1,0 +1,25 @@
+figures:
+  format: pdf
+  dpi: 600
+  panel_width_cm: 6
+  panel_height_cm: 5.5
+  margins: {
+    left: 1.4,
+    bottom: 1.0,
+    right: 0.4,
+    top: 0.3,
+  }
+  separation: {
+    x: 0.2,
+    y: 0.2,
+  }
+  font_sizes: {
+    axes: 8,
+    text: 6,
+  }
+  colors: {
+    color_1: [0.8500, 0.3250, 0.0980],
+    color_2: [0.4660, 0.6740, 0.1880],
+    color_3: [0.4940, 0.1840, 0.5560],
+    color_4: [0,      0.4470, 0.7410],
+  }
