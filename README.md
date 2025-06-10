@@ -19,8 +19,6 @@ project-root/
 ├── environment.yml         # Conda environment file
 ├── poetry.lock             # Locked dependencies  
 ├── pyproject.toml          # Project definition
-├── .gitignore              # Git ignore rules
-├── .pre-commit-config.yaml # Pre-commit hooks configuration
 
 ├── README.md               # README
 └── LICENSE                 # License file
