@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -13,6 +14,15 @@ class FontSizes:
     axes: float
     text: float
 
+    def __post_init__(self) -> None:
+        """Post-initialization checks for font sizes.
+        
+        Raises:
+            ValueError: If any font size is negative.
+        """
+        if self.axes < 0 or self.text < 0:
+            raise ValueError("Font sizes must be positive.")
+
 @dataclass
 class Dimensions:
     """Stores width and height dimensions.
@@ -23,6 +33,15 @@ class Dimensions:
     """
     width: float
     height: float
+
+    def __post_init__(self) -> None:
+        """Post-initialization checks for dimensions.
+        
+        Raises:
+            ValueError: If width or height is negative.
+        """
+        if self.width < 0 or self.height < 0:
+            raise ValueError("Dimensions must be positive.")
 
 @dataclass
 class Margins:
@@ -39,6 +58,15 @@ class Margins:
     left: float
     right: float
 
+    def __post_init__(self) -> None:
+        """Post-initialization checks for margins.
+        
+        Raises:
+            ValueError: If any margin value is negative.
+        """
+        if self.top < 0 or self.bottom < 0 or self.left < 0 or self.right < 0:
+            raise ValueError("Margins must be non-negative.")
+
 @dataclass
 class AxSeparation:
     """Stores separation distances between adjacent axes.
@@ -49,6 +77,15 @@ class AxSeparation:
     """
     x: float = 0.0
     y: float = 0.0
+
+    def __post_init__(self) -> None:
+        """Post-initialization checks for axis separation.
+        
+        Raises:
+            ValueError: If x or y separation is negative.
+        """
+        if self.x < 0 or self.y < 0:
+            raise ValueError("Axis separation must be non-negative.")
 
 @dataclass
 class PanelConfig:
@@ -123,15 +160,15 @@ def override_config(base: dict[str, Any], updates: dict[str, Any]) -> dict[str, 
         if isinstance(value, int | float):
             return value
         if isinstance(value, str):
-            if value.startswith("+="):
-                return current + float(value[2:])
-            elif value.startswith("-="):
-                return current - float(value[2:])
-            elif value.startswith("*"):
-                return current * float(value[1:])
-            elif value.startswith("="):
-                return float(value[1:])
             try:
+                if value.startswith("+="):
+                    return current + float(value[2:])
+                elif value.startswith("-="):
+                    return current - float(value[2:])
+                elif value.startswith("*"):
+                    return current * float(value[1:])
+                elif value.startswith("="):
+                    return float(value[1:])
                 return float(value)
             except ValueError as e:
                 raise ValueError(f"Invalid override format: {value}") from e
@@ -153,7 +190,7 @@ def override_config(base: dict[str, Any], updates: dict[str, Any]) -> dict[str, 
         Raises:
             KeyError: If trying to override a base key that doesn't exist.
         """
-        result = base_dict.copy()
+        result = copy.deepcopy(base_dict)
         for key, val in override_dict.items():
             if key not in result:
                 raise KeyError(f"Cannot override non-existent key: {key}")

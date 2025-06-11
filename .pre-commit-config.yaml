@@ -3,8 +3,22 @@ repos:
     rev: v0.11.13
     hooks:
       - id: ruff
+        stages: [pre-commit]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.16.0
     hooks:
       - id: mypy
+        additional_dependencies:
+          - pytest
+        stages: [pre-commit]
+
+  - repo: local
+    hooks:
+    - id: run-pytest
+      name: Run pytest before push
+      entry: poetry run pytest
+      language: system
+      pass_filenames: false
+      always_run: true
+      stages: [pre-push]

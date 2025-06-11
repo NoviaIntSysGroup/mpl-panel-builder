@@ -19,9 +19,12 @@ ruff = "^0.11.13"
 mypy = "^1.16.0"
 types-pyyaml = "^6.0.12.20250516"
 pre-commit = "^4.2.0"
+pytest = "^8.4.0"
+pytest-cov = "^6.1.1"
 
 [tool.mypy]
 strict = true
+mypy_path = ["src"]
 
 [tool.ruff]
 line-length = 88
@@ -29,6 +32,11 @@ target-version = "py311"
 select = ["E", "F", "I", "B", "N", "UP", "C4", "T20", "A"]
 ignore = ["E203"]
 fix = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=mpl_panel_builder"
+pythonpath = ["src"]
 
 [tool.poetry-dynamic-versioning]
 enable = true

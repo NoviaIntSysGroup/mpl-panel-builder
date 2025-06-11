@@ -1,5 +1,7 @@
 # mpl-panel-builder
 
+[![Pre-commit](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/pre-commit.yml)
+[![tests](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/tests.yml/badge.svg)](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/tests.yml)
 ![Black](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![Ruff](https://img.shields.io/badge/linter-ruff-0098db)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
@@ -12,6 +14,11 @@ project-root/
 │   │   ├── __init__.py
 │   │   ├── panel_builder.py
 │   │   ├── panel_config.py
+├── tests/
+│   ├── __init__.py
+│   ├── conftest.py
+│   ├── test_panel_builder.py
+│   ├── test_panel_config.py
 ├── notebooks/              # Jupyter notebooks for usage & examples
 │   ├── demo.ipynb          # Example usage
 ├── config.yaml             # Panel configuration file for example usage
@@ -29,7 +36,7 @@ The project uses Conda to create a Python 3.12 virtual environment, and Poetry t
 
 ```bash
 # Clone the repository (e.g using SSH or by downloading it as a zip file)
-$ git clone ADD LINK
+$ git clone git@github.com:NoviaIntSysGroup/mpl-panel-builder.git
 $ cd mpl-panel-builder
 # Set up the Conda environment
 $ conda env create -f environment.yml
@@ -46,9 +53,13 @@ See the example notebooks for how to create custom figure panels.
 ## Contribution
 Install the development dependencies:
 ```bash
-poetry install --with notebook --with dev
+# Install all dependencies including dev tools and notebooks
+poetry install --with dev,notebook
+
+# Set up pre-commit hooks
+poetry run pre-commit install --hook-type pre-commit --hook-type pre-push
 ```
-and follow the guidelines below to maintain code quality and consistency across the project.
+and follow the guidelines below to maintain code quality and consistency across the project. The pre-commit hook runs linters (ruff, mypy) on each commit. The pre-push hook runs the test suite (pytest) before each push.
 
 ### Code Style
 Use [Google-style docstrings](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings) for all public modules, functions, classes, and methods.
@@ -67,6 +78,14 @@ poetry run ruff check .
 
 # Type-check with mypy
 poetry run mypy .
+```
+
+### Testing
+The project uses [pytest](https://docs.pytest.org/) for unit testing. To run the tests locally:
+
+```bash
+poetry run pytest
+poetry run pytest --cov=mpl_panel_builder
 ```
 
 ## License
