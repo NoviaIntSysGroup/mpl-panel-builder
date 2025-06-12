@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Literal
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -111,9 +111,10 @@ class PanelBuilder:
             "axes.facecolor": "none",
             "axes.spines.right": False,
             "axes.spines.top": False,
+            "axes.titlepad": 4,
 
             # Font sizes
-            "font.size": axes_font_size,
+            "font.size": text_font_size,
             "axes.titlesize": axes_font_size,
             "axes.labelsize": axes_font_size,
             "xtick.labelsize": axes_font_size,
@@ -255,6 +256,24 @@ class PanelBuilder:
         # Hide tick labels
         ax.set_xticklabels([])
         ax.set_yticklabels([])
+
+    def cm_to_rel(self, cm: float, dim: Literal["width", "height"]) -> float:
+        """Converts a length in cm to a relative coordinate.
+        
+        Args:
+            cm (float): The length in cm.
+            dim (Literal["width", "height"]): The dimension to 
+                convert to relative coordinates.
+
+        Returns:
+            float: The relative coordinate.
+        """
+        if dim == "width":
+            return cm / self.config.panel_dimensions_cm.width
+        elif dim == "height":
+            return cm / self.config.panel_dimensions_cm.height
+        else:
+            raise ValueError(f"Invalid dimension: {dim}")
 
     @property
     def fig(self) -> MatplotlibFigure:

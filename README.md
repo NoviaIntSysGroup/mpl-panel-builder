@@ -13,14 +13,27 @@ project-root/
 │   ├── mpl_panel_builder/  # Installable shared package
 │   │   ├── __init__.py
 │   │   ├── panel_builder.py
-│   │   ├── panel_config.py
+│   │   └── panel_config.py
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py
 │   ├── test_panel_builder.py
-│   ├── test_panel_config.py
+│   └── test_panel_config.py
 ├── notebooks/              # Jupyter notebooks for usage & examples
-│   ├── demo.ipynb          # Example usage
+│   └── usage_demo.ipynb    # Example usage
+├── tikz/                   # TikZ files for assemblying panels
+│   ├── usage_demo.tex      # Example usage
+│   └──  tikz_settings.tex   # TikZ settings and style definitions
+├── outputs/                    # Generated content
+│   ├── panels/                 # Individual matplotlib panels
+│   │   ├── panel_a.pdf
+│   │   ├── panel_b.png
+│   │   └── panel_c.svg
+│   ├── figures/                # Complete assembled figures
+│   │   ├── figure_1.pdf
+│   │   ├── figure_2.png
+│   │   └── demo_figure.pdf
+│   └── readme_assets/          # Figures specifically for README
 ├── config.yaml             # Panel configuration file for example usage
 
 ├── environment.yml         # Conda environment file
