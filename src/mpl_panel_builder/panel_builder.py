@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib.axes import Axes as MatplotlibAxes
 from matplotlib.figure import Figure as MatplotlibFigure
 
-from mpl_panel_builder.panel_config import PanelConfig
+from mpl_panel_builder.panel_builder_config import PanelBuilderConfig
 
 
 class PanelBuilder:
@@ -33,7 +33,7 @@ class PanelBuilder:
             debug (bool, optional): Whether to draw debug grid lines. 
                 Defaults to False.
         """
-        self.config = PanelConfig.from_dict(config)
+        self.config = PanelBuilderConfig.from_dict(config)
         self.debug = debug
         self.n_rows: int = type(self).n_rows
         self.n_cols: int = type(self).n_cols

@@ -5,14 +5,56 @@ from typing import TypeAlias
 
 import pytest
 
-from mpl_panel_builder.panel_config import (
-    PanelConfig,
+from mpl_panel_builder.panel_builder_config import (
+    CustomConfigDotDict,
+    PanelBuilderConfig,
     override_config,
 )
 
 ConfigDict: TypeAlias = dict[str, dict[str, float]]
 
+# Tests for CustomConfigDotDict
+def test_custom_config_dot_dict() -> None:
+    """Test the core functionality of CustomConfigDotDict."""
+    
+    # Test data with nested structure
+    config_data = {
+        'key1': {
+            'subkey1': 'value1',
+            'subkey2': 42
+        },
+        'key2': 'value2',
+        'key3': True
+    }
+    
+    config = CustomConfigDotDict(config_data)
+    
+    # Test dot notation access works
+    assert config.key2 == 'value2'
+    assert config.key3 is True
+    
+    # Test nested dot notation access works
+    assert config.key1.subkey1 == 'value1'
+    assert config.key1.subkey2 == 42
+    
+    # Test dictionary access still works
+    assert config['key2'] == 'value2'
+    assert config['key1']['subkey1'] == 'value1'
+    
+    # Test read-only behavior - cannot modify attributes
+    with pytest.raises(AttributeError, match="Cannot modify read-only config"):
+        config.key2 = 'new_value'
+    
+    # Test read-only behavior - cannot delete attributes
+    with pytest.raises(AttributeError, match="Cannot delete read-only config"):
+        del config.key2
+    
+    # Test accessing non-existent attribute raises AttributeError
+    with pytest.raises(AttributeError, match="Object has no attribute 'nonexistent'"):
+        _ = config.nonexistent
 
+
+# Tests for PanelBuilderConfig
 def test_from_dict_with_optional_ax_separation(
     sample_config_dict: ConfigDict
 ) -> None:
@@ -28,7 +70,7 @@ def test_from_dict_with_optional_ax_separation(
     # Remove the optional key to test default behavior
     del missing_ax_separation_dict["ax_separation_cm"]
     
-    config = PanelConfig.from_dict(missing_ax_separation_dict)
+    config = PanelBuilderConfig.from_dict(missing_ax_separation_dict)
     
     # Should use defaults for ax_separation_cm
     assert config.ax_separation_cm.x == pytest.approx(0.0)
@@ -56,8 +98,8 @@ def test_from_dict_missing_required_keys(
             )
     }
     
-    with pytest.raises(KeyError):
-        PanelConfig.from_dict(incomplete_dict)
+    with pytest.raises(TypeError):
+        PanelBuilderConfig.from_dict(incomplete_dict)
 
 
 def test_from_dict_invalid_nested_structure(
@@ -78,7 +120,7 @@ def test_from_dict_invalid_nested_structure(
     del invalid_dict["panel_dimensions_cm"]["height"]
     
     with pytest.raises(TypeError):
-        PanelConfig.from_dict(invalid_dict)
+        PanelBuilderConfig.from_dict(invalid_dict)
 
 
 def test_from_dict_invalid_dimensions(
@@ -99,7 +141,7 @@ def test_from_dict_invalid_dimensions(
     invalid_dict["panel_dimensions_cm"]["width"] = -10.0
     
     with pytest.raises(ValueError):
-        PanelConfig.from_dict(invalid_dict)
+        PanelBuilderConfig.from_dict(invalid_dict)
 
 
 def test_arithmetic_operations(sample_config_dict: ConfigDict) -> None:
@@ -316,7 +358,7 @@ def test_config_creation_with_overrides(
     }
     
     updated_dict = override_config(sample_config_dict, user_overrides)
-    config = PanelConfig.from_dict(updated_dict)
+    config = PanelBuilderConfig.from_dict(updated_dict)
     
     # Verify the pipeline worked end-to-end
     assert config.panel_dimensions_cm.width == pytest.approx(15.0)
@@ -352,4 +394,4 @@ def test_config_override_error_propagation(
     error_msg = "Invalid override format: invalid_operation"
     with pytest.raises(ValueError, match=error_msg):
         updated_dict = override_config(sample_config_dict, invalid_overrides)
-        PanelConfig.from_dict(updated_dict)  # This line shouldn't be reached
+        PanelBuilderConfig.from_dict(updated_dict)  # This line shouldn't be reached

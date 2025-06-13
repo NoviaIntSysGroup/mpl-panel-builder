@@ -1,10 +1,128 @@
 import copy
-from dataclasses import dataclass, field
-from typing import Any
+from dataclasses import dataclass, field, fields, is_dataclass
+from typing import Any, TypeVar
+
+T = TypeVar("T", bound="FrozenConfigBase")
 
 
-@dataclass
-class FontSizes:
+class CustomConfigDotDict(dict[str, Any]):
+    """A read-only dictionary that can be accessed as an object with dot notation.
+    
+    This class is used to provide dot access to non-mandatory custom 
+    configuration values. This allows for more flexible configuration, while
+    still providing a consistent interface for all configuration values.
+    """
+    def __init__(self, d: dict[str, Any]) -> None:
+        """Initializes the dictionary with the given values.
+        
+        Args:
+            d: The dictionary to initialize the CustomConfigDotDict with.
+        """
+        super().__init__()
+        for key, value in d.items():
+            self[key] = self._wrap(value)
+
+    def __getattr__(self, key: str) -> Any:
+        """Returns the value for the given key.
+        
+        Args:
+            key: The key to get the value for.
+        """
+        try:
+            return self[key]
+        except KeyError as e:
+            raise AttributeError(f"Object has no attribute '{key}'") from e
+
+    def __setattr__(self, key: str, value: Any) -> None:
+        """Raises an error if the attribute is set.
+        
+        Args:
+            key: The key to set the value for.
+            value: The value to set.
+        """
+        raise AttributeError(f"Cannot modify read-only config attribute '{key}'")
+
+    def __delattr__(self, key: str) -> None:
+        """Raises an error if the attribute is deleted.
+        
+        Args:
+            key: The key to delete.
+        """
+        raise AttributeError(f"Cannot delete read-only config attribute '{key}'")
+
+    def _wrap(self, value: Any) -> Any:
+        """Wraps the value in a CustomConfigDotDict if it is a dictionary.
+        
+        Args:
+            value: The value to wrap.
+        """
+        if isinstance(value, dict):
+            return CustomConfigDotDict(value)
+        return value
+
+
+@dataclass(frozen=True)
+class FrozenConfigBase:
+    """Base class for immutable config objects with dot access to extra fields.
+    
+    This class is used to create immutable config objects with dot access to extra 
+    fields. The extra fields are stored in the _extra attribute, which is a dictionary
+    of key-value pairs.
+    """
+    _extra: dict[str, Any] = field(default_factory=dict, init=False, repr=False)
+
+    def __getattr__(self, name: str) -> Any:
+        """Returns the value for the given key.
+        
+        Args:
+            name: The key to get the value for.
+        """
+        # Safely access _extra only if initialized
+        extra = object.__getattribute__(self, "__dict__").get("_extra", {})
+        if name in extra:
+            return extra[name]
+        raise AttributeError(f"Object has no attribute '{name}'")
+
+    @classmethod
+    def from_dict(cls: type[T], data: dict[str, Any]) -> T:
+        """Creates a FrozenConfigBase instance from a dictionary.
+        
+        Args:
+            data: The dictionary to create the instance from.
+
+        Returns:
+            The FrozenConfigBase instance.
+        """
+        field_names = {f.name for f in fields(cls)}
+        declared = {}
+        extra = {}
+
+        for key, value in data.items():
+            # If the key is a declared field, add it to the declared dictionary
+            if key in field_names:
+                field_type = next(f.type for f in fields(cls) if f.name == key)
+
+                # If the field is a dataclass, convert the value to the dataclass type
+                if is_dataclass(field_type) and isinstance(value, dict):
+                    # The field_type has from_dict as it inherits from FrozenConfigBase
+                    value = field_type.from_dict(value)  # type: ignore
+
+                declared[key] = value
+
+            # If the key is not a declared field, add it to the extra dictionary    
+            else:
+                extra[key] = CustomConfigDotDict(value)
+
+        # Create the frozen dataclass instance
+        instance = cls(**declared)  # This triggers __post_init__ if defined
+
+        # Inject _extra manually, bypassing frozen restriction
+        object.__setattr__(instance, "_extra", extra)
+        return instance
+
+
+@dataclass(frozen=True)
+class FontSizes(FrozenConfigBase):
     """Stores font sizes for different figure elements.
     
     Attributes:
@@ -23,8 +141,9 @@ class FontSizes:
         if self.axes < 0 or self.text < 0:
             raise ValueError("Font sizes must be positive.")
 
-@dataclass
-class Dimensions:
+
+@dataclass(frozen=True)
+class Dimensions(FrozenConfigBase):
     """Stores width and height dimensions.
     
     Attributes:
@@ -43,8 +162,9 @@ class Dimensions:
         if self.width < 0 or self.height < 0:
             raise ValueError("Dimensions must be positive.")
 
-@dataclass
-class Margins:
+
+@dataclass(frozen=True)
+class Margins(FrozenConfigBase):
     """Stores margin sizes for all sides of a panel.
     
     Attributes:
@@ -67,8 +187,9 @@ class Margins:
         if self.top < 0 or self.bottom < 0 or self.left < 0 or self.right < 0:
             raise ValueError("Margins must be non-negative.")
 
-@dataclass
-class AxSeparation:
+
+@dataclass(frozen=True)
+class AxSeparation(FrozenConfigBase):
     """Stores separation distances between adjacent axes.
     
     Attributes:
@@ -87,10 +208,15 @@ class AxSeparation:
         if self.x < 0 or self.y < 0:
             raise ValueError("Axis separation must be non-negative.")
 
-@dataclass
-class PanelConfig:
-    """Configuration for a figure panel
+
+@dataclass(frozen=True)
+class PanelBuilderConfig(FrozenConfigBase):
+    """Read only configuration for PanelBuilder.
     
+    This class is immutable and provides dot-access to all fields in a nested
+    configuration dictionary. This includes both mandatory fields required by
+    the PanelBuilder class and use-case specific optional fields.
+
     Attributes:
         panel_dimensions_cm: Overall panel dimensions in centimeters.
         panel_margins_cm: Panel margin sizes in centimeters.
@@ -100,29 +226,7 @@ class PanelConfig:
     panel_dimensions_cm: Dimensions
     panel_margins_cm: Margins
     font_sizes_pt: FontSizes
-    ax_separation_cm: AxSeparation = field(default_factory=AxSeparation)
-
-    @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "PanelConfig":
-        """Creates a PanelConfig instance from a dictionary.
-        
-        Args:
-            data: Dictionary containing panel configuration parameters.
-                Must include 'panel_dimensions_cm' and 'panel_margins_cm', and
-                'font_sizes_pt' keys. Optional keys are 'ax_separation_cm'.
-        
-        Returns:
-            PanelConfig: A new PanelConfig instance with the specified configuration.
-            
-        Raises:
-            KeyError: If any required configuration keys are missing.
-        """
-        return cls(
-            panel_dimensions_cm=Dimensions(**data["panel_dimensions_cm"]),
-            panel_margins_cm=Margins(**data["panel_margins_cm"]),
-            font_sizes_pt=FontSizes(**data["font_sizes_pt"]),
-            ax_separation_cm=AxSeparation(**data.get("ax_separation_cm", {})),
-        )
+    ax_separation_cm: AxSeparation = AxSeparation()
 
 
 def override_config(base: dict[str, Any], updates: dict[str, Any]) -> dict[str, Any]:
