@@ -13,13 +13,14 @@ project-root/
 │   ├── mpl_panel_builder/  # Installable shared package
 │   │   ├── __init__.py
 │   │   ├── panel_builder.py
-│   │   └── panel_config.py
+│   │   └── panel_builder_config.py
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py
 │   ├── test_panel_builder.py
-│   └── test_panel_config.py
-├── notebooks/              # Jupyter notebooks for usage & examples
+│   └── test_panel_builder_config.py
+├── examples/               # Jupyter notebooks for usage & examples
+│   ├── file_helpers.py
 │   └── usage_demo.ipynb    # Example usage
 ├── tikz/                   # TikZ files for assemblying panels
 │   ├── usage_demo.tex      # Example usage

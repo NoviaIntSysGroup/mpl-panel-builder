@@ -207,6 +207,29 @@ class AxSeparation(FrozenConfigBase):
         """
         if self.x < 0 or self.y < 0:
             raise ValueError("Axis separation must be non-negative.")
+        
+
+@dataclass(frozen=True)
+class PanelOutput(FrozenConfigBase):
+    """Stores output configuration for panels.
+    
+    Attributes:
+        directory: Directory to save the panel.
+        format: Format to save the panel.
+        dpi: DPI of the panel (if valid).
+    """
+    directory: str | None = None
+    format: str = "pdf"
+    dpi: int = 600
+
+    def __post_init__(self) -> None:
+        """Post-initialization checks for panel output.
+        
+        Raises:
+            ValueError: If dpi is negative.
+        """
+        if self.dpi < 0:
+            raise ValueError("DPI must be positive.")
 
 
 @dataclass(frozen=True)
@@ -222,12 +245,13 @@ class PanelBuilderConfig(FrozenConfigBase):
         panel_margins_cm: Panel margin sizes in centimeters.
         font_sizes_pt: Font sizes for different figure elements in points.
         ax_separation_cm: Separation between adjacent axes in centimeters.
+        panel_output: Output configuration for panels.
     """
     panel_dimensions_cm: Dimensions
     panel_margins_cm: Margins
     font_sizes_pt: FontSizes
     ax_separation_cm: AxSeparation = AxSeparation()
-
+    panel_output: PanelOutput = PanelOutput()
 
 def override_config(base: dict[str, Any], updates: dict[str, Any]) -> dict[str, Any]:
     """Overrides a base configuration with update values.

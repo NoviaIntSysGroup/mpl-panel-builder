@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import TypeAlias
+from typing import Any, TypeAlias
 
 import pytest
 
@@ -11,7 +11,7 @@ from mpl_panel_builder.panel_builder_config import (
     override_config,
 )
 
-ConfigDict: TypeAlias = dict[str, dict[str, float]]
+ConfigDict: TypeAlias = dict[str, dict[str, Any]]
 
 # Tests for CustomConfigDotDict
 def test_custom_config_dot_dict() -> None:

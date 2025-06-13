@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Literal
 
 import matplotlib.pyplot as plt
@@ -19,6 +20,7 @@ class PanelBuilder:
         config (PanelConfig): Configuration object containing panel dimensions,
             margins, font sizes, and axis separation settings.
         debug (bool): Whether to draw debug grid lines for layout assistance.
+        panel_name (str): Name of the panel to use for saving the figure.
         n_rows (int): Number of subplot rows defined by the user.
         n_cols (int): Number of subplot columns defined by the user.
         fig (Optional[MatplotlibFigure]): Created matplotlib figure object.
@@ -35,6 +37,7 @@ class PanelBuilder:
         """
         self.config = PanelBuilderConfig.from_dict(config)
         self.debug = debug
+        self.panel_name: str = type(self).panel_name
         self.n_rows: int = type(self).n_rows
         self.n_cols: int = type(self).n_cols
 
@@ -75,6 +78,7 @@ class PanelBuilder:
             self.draw_debug_lines()
             self._axs_grid = self.create_axes()
             self.build_panel()
+            self.save_fig()
         return self.fig
 
     def build_panel(self) -> None:
@@ -274,6 +278,23 @@ class PanelBuilder:
             return cm / self.config.panel_dimensions_cm.height
         else:
             raise ValueError(f"Invalid dimension: {dim}")
+        
+    def save_fig(self) -> None:
+        """Saves the figure to the output directory."""
+        # Check if output directory is set
+        # TODO: Add logging to inform the user that the figure has been saved
+        if self.config.panel_output.directory:
+        
+            # Check if the directory exists
+            directory = Path(self.config.panel_output.directory)
+            if not directory.exists():
+                raise ValueError(f"Output directory does not exist: {directory}")
+            
+            # Save the figure
+            file_format = self.config.panel_output.format
+            dpi = self.config.panel_output.dpi
+            self.fig.savefig(directory / f"{self.panel_name}.{file_format}", dpi=dpi)
+        
 
     @property
     def fig(self) -> MatplotlibFigure:

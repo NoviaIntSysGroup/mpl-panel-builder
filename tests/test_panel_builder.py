@@ -11,10 +11,15 @@ from mpl_panel_builder.panel_builder import PanelBuilder
 ConfigDict: TypeAlias = dict[str, dict[str, float]]
 
 
-def make_dummy_panel_class(n_rows: int = 1, n_cols: int = 1) -> type[PanelBuilder]:
+def make_dummy_panel_class(
+    panel_name: str = "dummy_panel",
+    n_rows: int = 1, 
+    n_cols: int = 1
+) -> type[PanelBuilder]:
     """Create a dummy PanelBuilder subclass for testing.
     
     Args:
+        panel_name: Name of the panel to use for saving the figure.
         n_rows: Number of rows in the panel grid.
         n_cols: Number of columns in the panel grid.
         
@@ -26,6 +31,7 @@ def make_dummy_panel_class(n_rows: int = 1, n_cols: int = 1) -> type[PanelBuilde
         "DummyPanel",
         (PanelBuilder,),
         {
+            "panel_name": panel_name,
             "n_rows": n_rows,
             "n_cols": n_cols,
             "build_panel": lambda self: self.axs_grid[0][0].plot([0, 1], [0, 1]),
@@ -33,12 +39,12 @@ def make_dummy_panel_class(n_rows: int = 1, n_cols: int = 1) -> type[PanelBuilde
     )
 
 
-def test_subclass_validation_raises_without_n_rows_n_cols() -> None:
-    """Ensure PanelBuilder subclass requires n_rows and n_cols.
+def test_subclass_validation_raises_without_attributes() -> None:
+    """Ensure PanelBuilder subclass requires panel_name, n_rows and n_cols.
     
     Raises:
         TypeError: When attempting to create a PanelBuilder subclass without 
-            defining n_rows and n_cols class attributes.
+            defining panel_name, n_rows and n_cols class attributes.
     """
 
     with pytest.raises(TypeError):
@@ -117,7 +123,7 @@ def test_axs_grid_has_correct_dimensions(
         None
     """
 
-    dummy_builder = make_dummy_panel_class(n_rows, n_cols)
+    dummy_builder = make_dummy_panel_class(n_rows=n_rows, n_cols=n_cols)
     builder = dummy_builder(sample_config_dict)
     _ = builder()
 
