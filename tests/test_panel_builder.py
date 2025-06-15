@@ -53,6 +53,16 @@ def test_subclass_validation_raises_without_attributes() -> None:
             pass
 
 
+def test_subclass_validation_raises_without_panel_name() -> None:
+    """Ensure PanelBuilder subclass requires panel_name attribute."""
+
+    with pytest.raises(TypeError):
+
+        class InvalidPanel(PanelBuilder):
+            n_rows = 1
+            n_cols = 1
+
+
 def test_build_returns_matplotlib_figure(sample_config_dict: ConfigDict) -> None:
     """Test that calling the builder returns a matplotlib figure.
     
