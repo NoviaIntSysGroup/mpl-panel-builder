@@ -67,8 +67,13 @@ class PanelBuilder:
                 + ", ".join(missing)
             )
 
-    def __call__(self) -> MatplotlibFigure:
+    def __call__(self, *args: Any, **kwargs: Any) -> MatplotlibFigure:
         """Initializes and builds the panel, returning the resulting figure.
+
+        Any positional and keyword arguments are forwarded to
+        :meth:`build_panel`. If :meth:`build_panel` returns a string, it is
+        treated as a filename *suffix* appended to :pyattr:`panel_name` when the
+        panel is saved. Returning ``None`` keeps the default filename.
 
         Returns:
             MatplotlibFigure: The constructed matplotlib figure.
@@ -78,17 +83,19 @@ class PanelBuilder:
             self._fig = self.create_fig()
             self.draw_debug_lines()
             self._axs_grid = self.create_axes()
-            self.build_panel()
-            self.save_fig()
+            filename_suffix = self.build_panel(*args, **kwargs)
+            self.save_fig(filename_suffix if isinstance(filename_suffix, str) else None)
         return self.fig
 
-    def build_panel(self) -> None:
+    def build_panel(self, *args: Any, **kwargs: Any) -> Any:
         """Populates the panel with plot content.
-        
-        This method should be implemented by subclasses to create the actual plot 
-        content. The base implementation raises NotImplementedError since each panel 
-        implementation should provide its own visualization logic.
-        
+
+        Subclasses should implement their plotting logic here.  The return value
+        may optionally be a string which will be appended to
+        :pyattr:`panel_name` when the panel is saved.  Any positional and
+        keyword arguments passed to :py:meth:`__call__` are forwarded to this
+        method.
+
         Raises:
             NotImplementedError: This method must be implemented by subclasses.
         """
@@ -280,21 +287,29 @@ class PanelBuilder:
         else:
             raise ValueError(f"Invalid dimension: {dim}")
         
-    def save_fig(self) -> None:
-        """Saves the figure to the output directory."""
+    def save_fig(self, filename_suffix: str | None = None) -> None:
+        """Saves the figure to the output directory.
+
+        Args:
+            filename_suffix: Optional string to append to
+                :pyattr:`panel_name` when naming the saved file.
+        """
         # Check if output directory is set
         # TODO: Add logging to inform the user that the figure has been saved
         if self.config.panel_output.directory:
-        
+
             # Check if the directory exists
             directory = Path(self.config.panel_output.directory)
             if not directory.exists():
                 raise ValueError(f"Output directory does not exist: {directory}")
-            
+
             # Save the figure
             file_format = self.config.panel_output.format
             dpi = self.config.panel_output.dpi
-            self.fig.savefig(directory / f"{self.panel_name}.{file_format}", dpi=dpi)
+            panel_name = self.panel_name
+            if filename_suffix:
+                panel_name = f"{panel_name}_{filename_suffix}"
+            self.fig.savefig(directory / f"{panel_name}.{file_format}", dpi=dpi)
         
 
     @property

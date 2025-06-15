@@ -1,4 +1,5 @@
-from typing import TypeAlias
+import pathlib
+from typing import Any, TypeAlias
 
 import matplotlib
 import pytest
@@ -8,7 +9,7 @@ from matplotlib.figure import Figure as MatplotlibFigure
 
 from mpl_panel_builder.panel_builder import PanelBuilder
 
-ConfigDict: TypeAlias = dict[str, dict[str, float]]
+ConfigDict: TypeAlias = dict[str, dict[str, Any]]
 
 
 def make_dummy_panel_class(
@@ -176,3 +177,35 @@ def test_fig_has_correct_margins(sample_config_dict: ConfigDict) -> None:
     assert pytest.approx(ax.get_position().y0) == expected_y
     assert pytest.approx(ax.get_position().width) == expected_width
     assert pytest.approx(ax.get_position().height) == expected_height
+
+
+def test_filename_suffix(
+    tmp_path: pathlib.Path, sample_config_dict: ConfigDict
+) -> None:
+    """Suffix returned from ``build_panel`` is appended to ``panel_name``."""
+
+    class CustomPanel(PanelBuilder):
+        panel_name = "dummy_panel"
+        n_rows = 1
+        n_cols = 1
+
+        def build_panel(self, suffix: str | None = None) -> str | None:
+            self.axs_grid[0][0].plot([0, 1], [0, 1])
+            return suffix
+
+    config = dict(sample_config_dict)
+    config["panel_output"] = {
+        "directory": str(tmp_path),
+        "format": "png",
+        "dpi": 72,
+    }
+
+    # Without suffix → default filename
+    builder = CustomPanel(config)
+    builder()
+    assert (tmp_path / "dummy_panel.png").exists()
+
+    # With suffix → suffix appended
+    builder = CustomPanel(config)
+    builder(suffix="alt")
+    assert (tmp_path / "dummy_panel_alt.png").exists()
