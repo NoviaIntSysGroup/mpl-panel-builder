@@ -1,0 +1,32 @@
+\documentclass[tikz, 11pt]{standalone}
+
+\input{../tikz_settings.tex}
+
+% Figure specific commands
+\newcommand{\vSep}{3mm}
+
+\begin{document}
+\begin{tikzpicture}[x=\unit, y=\unit]
+%\node[panel, draw=gray, dotted, minimum width=\figPanelWidth, minimum height=\figPanelHeightSquare] (a) {Placeholder box};
+
+% Row 1
+\node[panel] (a) {\includegraphics[]{"../../outputs/config_visualization/panels/dim_panel"}};
+%\node[headingNode, anchor=south] (ah) at (a.north) {\headingSize panel\_dimensions\_cm};
+\node[panel, anchor=west](b) at (a.east) {\includegraphics[]{"../../outputs/config_visualization/panels/margin_panel"}};
+
+% H1
+\node[headingNode, anchor=south, yshift=\vSep] (h1) at (a.north east) {\figHeading{Config dict keys visually explained}};
+\draw[lineShort] (h1.west) -- (h1-|a.west);
+\draw[lineShort] (h1.east) -- (h1-|b.east);	
+
+% Row 2
+\node[panel, anchor=north west, yshift=-\vSep](c) at (a.south west) {\includegraphics[]{"../../outputs/config_visualization/panels/axes_separation_panel"}};
+\node[panel, anchor=west](d) at (c.east) {\includegraphics[]{"../../outputs/config_visualization/panels/font_size_panel"}};
+
+% Labels
+\foreach \n in {a, b, c, d} {
+  \node[label] at (\n.north west) {\figLabel{\n}};
+}
+
+\end{tikzpicture}
+\end{document}

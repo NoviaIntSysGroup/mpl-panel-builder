@@ -24,7 +24,7 @@ class PanelBuilder:
         n_rows (int): Number of subplot rows defined by the user.
         n_cols (int): Number of subplot columns defined by the user.
         fig (Optional[MatplotlibFigure]): Created matplotlib figure object.
-        axs_grid (Optional[List[List[MatplotlibAxes]]]): Grid of axes objects.
+        axs (Optional[List[List[MatplotlibAxes]]]): Grid of axes objects.
     """
 
     def __init__(self, config: dict[str, Any], debug: bool = False):
@@ -37,12 +37,12 @@ class PanelBuilder:
         """
         self.config = PanelBuilderConfig.from_dict(config)
         self.debug = debug
-        self.panel_name: str = type(self).panel_name
-        self.n_rows: int = type(self).n_rows
-        self.n_cols: int = type(self).n_cols
+        self._panel_name: str = type(self).panel_name
+        self._n_rows: int = type(self).n_rows
+        self._n_cols: int = type(self).n_cols
 
         self._fig: MatplotlibFigure | None = None
-        self._axs_grid: list[list[MatplotlibAxes]] | None = None
+        self._axs: list[list[MatplotlibAxes]] | None = None
 
     def __init_subclass__(cls) -> None:
         """Validates that subclasses define required class attributes.
@@ -82,12 +82,12 @@ class PanelBuilder:
         with plt.rc_context(rc=style_context):
             self._fig = self.create_fig()
             self.draw_debug_lines()
-            self._axs_grid = self.create_axes()
+            self._axs = self.create_axes()
             filename_suffix = self.build_panel(*args, **kwargs)
-            self.save_fig(filename_suffix if isinstance(filename_suffix, str) else None)
+            self.save_fig(filename_suffix)
         return self.fig
 
-    def build_panel(self, *args: Any, **kwargs: Any) -> Any:
+    def build_panel(self, *args: Any, **kwargs: Any) -> str | None:
         """Populates the panel with plot content.
 
         Subclasses should implement their plotting logic here.  The return value
@@ -201,7 +201,7 @@ class PanelBuilder:
         ]
 
         # Create the axes
-        axs_grid: list[list[MatplotlibAxes]] = []
+        axs: list[list[MatplotlibAxes]] = []
         ax_x_left = plot_left  # left edge of plot region
         ax_y_top = plot_bottom + plot_height  # top edge of plot region
 
@@ -225,9 +225,9 @@ class PanelBuilder:
                 ax = self.fig.add_axes(ax_pos, aspect="auto")
                 row_axes.append(ax)
 
-            axs_grid.append(row_axes)
+            axs.append(row_axes)
 
-        return axs_grid
+        return axs
     
     def draw_debug_lines(self) -> None:
         """Draws debug lines on the axes to help with layout debugging.
@@ -324,12 +324,39 @@ class PanelBuilder:
         return self._fig
 
     @property
-    def axs_grid(self) -> list[list[MatplotlibAxes]]:
+    def axs(self) -> list[list[MatplotlibAxes]]:
         """List[List[matplotlib.axes.Axes]]: The grid of axes, guaranteed to exist.
 
         Raises:
             RuntimeError: If the axes grid has not been created yet.
         """
-        if self._axs_grid is None:
+        if self._axs is None:
             raise RuntimeError("Axes grid has not been created yet.")
-        return self._axs_grid
+        return self._axs
+
+    @property
+    def panel_name(self) -> str:
+        """str: The name of the panel used for saving the figure.
+
+        This is a read-only property that returns the panel name defined
+        in the class definition.
+        """
+        return self._panel_name
+
+    @property
+    def n_rows(self) -> int:
+        """int: The number of rows in the panel grid.
+
+        This is a read-only property that returns the number of rows defined
+        in the class definition.
+        """
+        return self._n_rows
+
+    @property
+    def n_cols(self) -> int:
+        """int: The number of columns in the panel grid.
+
+        This is a read-only property that returns the number of columns defined
+        in the class definition.
+        """
+        return self._n_cols

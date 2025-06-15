@@ -1,0 +1,41 @@
+% Packages
+\usepackage{amsmath,amssymb}
+\usepackage[scaled]{helvet}
+\renewcommand\familydefault{\sfdefault} 
+\usepackage{sfmath}
+\usetikzlibrary{shapes.geometric, arrows.meta, calc, decorations.pathmorphing}
+
+% Font sizes
+\newcommand{\tinySize}{\tiny}			% tiny corresponds to 6 pt
+\newcommand{\textSize}{\scriptsize}		% scriptsize corresponds to 8 pt
+\newcommand{\headingSize}{\small}		% small corresponds to 10 pt
+\newcommand{\labelSize}{\large}			% Large corresponds to 12 pt and bf for bold face
+
+% Figure labels
+\newcommand{\figLabel}[1]{\labelSize\textbf{\MakeLowercase{#1}}}
+
+% Figure section headings
+\newcommand{\figHeading}[1]{\headingSize \MakeUppercase{#1}}
+
+% Roman numerals
+\newcommand{\RomanNumeralCaps}[1]{\MakeUppercase{\romannumeral #1}}
+
+% Colors
+\definecolor{exampleHTML}{HTML}{DC3912}
+\definecolor{exampleRGB}{rgb}{0.8500, 0.3250, 0.0980}
+
+% Custom commands
+\newcommand{\unit}{1mm}
+\newcommand{\arrow}{{Latex[length=2*\unit, width=4*\unit]}}
+\newcommand{\lineWidth}{1pt}
+
+% Styles
+\tikzstyle{panel}=[draw=none, inner sep=0, outer sep=0]
+\tikzstyle{label}=[draw=none, anchor=north west, text height = 10pt, text depth=5pt, inner sep=0, outer sep=0, xshift=2mm, yshift=1mm]
+\tikzstyle{lines}=[draw=black, line width=\lineWidth, rounded corners=1mm]
+\tikzstyle{lineShort}=[lines, shorten > =3mm]
+\tikzstyle{boldArrow}=[draw=black, -\arrow, line width=2*\lineWidth]
+\tikzstyle{boldArrowShort}=[shorten > =3mm, shorten < =3mm]
+\tikzstyle{headingNode}=[draw=none, inner sep=1mm, text height=7pt, text depth=1pt, fill=none]
+\tikzstyle{textNode}=[draw=none, inner sep=1mm]
+\tikzstyle{labelNode}=[inner sep=0, outer sep=0, anchor=north east, xshift=7mm, yshift=-2mm]
