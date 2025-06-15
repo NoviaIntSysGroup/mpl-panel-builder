@@ -48,22 +48,23 @@ class PanelBuilder:
         """Validates that subclasses define required class attributes.
         
         This method ensures that any class inheriting from PanelBuilder properly
-        defines the required n_rows and n_cols class attributes that specify the
-        panel grid dimensions.
+        defines the required panel_name, n_rows and n_cols class attributes that
+        specify the panel grid dimensions.
         
         Args:
             cls: The class being defined that inherits from PanelBuilder.
             
         Raises:
-            TypeError: If the subclass does not define n_rows or n_cols.
+            TypeError: If the subclass does not define panel_name, n_rows or
+                n_cols.
         """
         super().__init_subclass__()
-        required_attrs = ['n_rows', 'n_cols']
+        required_attrs = ["panel_name", "n_rows", "n_cols"]
         missing = [attr for attr in required_attrs if not hasattr(cls, attr)]
         if missing:
             raise TypeError(
-                f"Subclasses of PanelBuilder must define class attributes: "
-                f"{', '.join(missing)}"
+                "Subclasses of PanelBuilder must define class attributes: "
+                + ", ".join(missing)
             )
 
     def __call__(self) -> MatplotlibFigure:
