@@ -29,9 +29,11 @@ mypy_path = ["src"]
 [tool.ruff]
 line-length = 88
 target-version = "py311"
+fix = true
+
+[tool.ruff.lint]
 select = ["E", "F", "I", "B", "N", "UP", "C4", "T20", "A"]
 ignore = ["E203"]
-fix = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
