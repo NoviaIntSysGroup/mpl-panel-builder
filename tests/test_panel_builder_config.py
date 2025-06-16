@@ -89,17 +89,21 @@ def test_from_dict_missing_required_keys(
         None
         
     Raises:
-        KeyError: Expected when required keys are missing.
+        TypeError: Expected when required keys are missing.
     """
-    # Keep only panel_dimensions_cm
-    incomplete_dict = {
-        "panel_dimensions_cm": copy.deepcopy(
-            sample_config_dict["panel_dimensions_cm"]
-            )
-    }
+    required_keys = [
+        "panel_dimensions_cm",
+        "panel_margins_cm",
+        "font_sizes_pt"
+    ]
     
-    with pytest.raises(TypeError):
-        PanelBuilderConfig.from_dict(incomplete_dict)
+    for key in required_keys:
+        # Create a copy of the sample config with one required key removed
+        incomplete_dict = copy.deepcopy(sample_config_dict)
+        del incomplete_dict[key]
+        
+        with pytest.raises(TypeError, match=f"missing.*required.*argument.*{key}"):
+            PanelBuilderConfig.from_dict(incomplete_dict)
 
 
 def test_from_dict_invalid_nested_structure(

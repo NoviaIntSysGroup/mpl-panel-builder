@@ -77,9 +77,9 @@ def plot_sinusoid(ax: Axes) -> None:
 class DimPanelDemo(PanelBuilder):
     """1 by 1 panel showing panel dimensions."""
 
-    n_cols = 1
-    n_rows = 1
-    panel_name = "dim_panel"
+    _n_cols = 1
+    _n_rows = 1
+    _panel_name = "dim_panel"
 
     def build_panel(self) -> None:
         """Create custom content for the panel."""
@@ -104,9 +104,9 @@ class DimPanelDemo(PanelBuilder):
 class MarginPanelDemo(PanelBuilder):
     """1 by 1 panel illustrating panel margins."""
 
-    n_cols = 1
-    n_rows = 1
-    panel_name = "margin_panel"
+    _n_cols = 1
+    _n_rows = 1
+    _panel_name = "margin_panel"
 
     def build_panel(self) -> None:
         """Create custom content for the panel."""
@@ -146,9 +146,9 @@ class MarginPanelDemo(PanelBuilder):
 class AxesSeparationPanelDemo(PanelBuilder):
     """2 by 2 panel showing axes separation."""
 
-    n_cols = 2
-    n_rows = 2
-    panel_name = "axes_separation_panel"
+    _n_cols = 2
+    _n_rows = 2
+    _panel_name = "axes_separation_panel"
 
     def build_panel(self) -> None:
         """Create custom content for the panel."""
@@ -185,9 +185,9 @@ class AxesSeparationPanelDemo(PanelBuilder):
 class FontSizePanelDemo(PanelBuilder):
     """1 by 1 panel demonstrating configured font sizes."""
 
-    n_cols = 1
-    n_rows = 1
-    panel_name = "font_size_panel"
+    _n_cols = 1
+    _n_rows = 1
+    _panel_name = "font_size_panel"
 
     def build_panel(self) -> None:
         """Create custom content for the panel."""

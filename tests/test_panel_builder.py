@@ -39,29 +39,31 @@ def make_dummy_panel_class(
         }
     )
 
-
-def test_subclass_validation_raises_without_attributes() -> None:
-    """Ensure PanelBuilder subclass requires panel_name, n_rows and n_cols.
+# Tests for PanelBuilder
+@pytest.mark.parametrize("missing_attr", ["_panel_name", "_n_rows", "_n_cols"])
+def test_subclass_validation_raises_without_required_attributes(
+    missing_attr: str
+) -> None:
+    """Ensure PanelBuilder subclass requires all required attributes.
     
+    Args:
+        missing_attr: The attribute to omit from the test class.
+        
     Raises:
         TypeError: When attempting to create a PanelBuilder subclass without 
-            defining panel_name, n_rows and n_cols class attributes.
+            defining all required class attributes.
     """
-
-    with pytest.raises(TypeError):
-
-        class InvalidPanel(PanelBuilder):
-            pass
-
-
-def test_subclass_validation_raises_without_panel_name() -> None:
-    """Ensure PanelBuilder subclass requires panel_name attribute."""
-
-    with pytest.raises(TypeError):
-
-        class InvalidPanel(PanelBuilder):
-            n_rows = 1
-            n_cols = 1
+    # Create a class dict with all required attributes
+    class_dict = {
+        "_panel_name": "test_panel",
+        "_n_rows": 1,
+        "_n_cols": 1
+    }
+    # Remove the attribute we're testing
+    del class_dict[missing_attr]
+    
+    with pytest.raises(TypeError, match=missing_attr):
+        type("InvalidPanel", (PanelBuilder,), class_dict)
 
 
 def test_build_returns_matplotlib_figure(sample_config_dict: ConfigDict) -> None:
@@ -69,9 +71,6 @@ def test_build_returns_matplotlib_figure(sample_config_dict: ConfigDict) -> None
     
     Args:
         sample_config_dict: A configuration dictionary for panel building.
-        
-    Returns:
-        None
     """
 
     dummy_builder = make_dummy_panel_class()
