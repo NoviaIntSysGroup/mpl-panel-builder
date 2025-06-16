@@ -6,105 +6,60 @@
 ![Ruff](https://img.shields.io/badge/linter-ruff-0098db)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-## Motivation
-This project provides a framework for creating publication-ready figures with consistent layouts and precise control over visual elements. The core principles underlying the package are:
-
-1. **Consistent Layout**: All figure panels within a publication should maintain uniform layouts with properly aligned elements by default.
-2. **Reproducible Workflow**: Complete figures should be reproducible through a single script execution.
-3. **Centralized Configuration**: Analysis and layout parameters should be defined in a single location.
-4. **Automated Updates**: All manuscript figures should update automatically or by running a single script whener analysis or layout parameters change.
-
-A common issue in scientific publications is the manual assembly of figures through copy-paste operations and arbitrary resizing, leading to inconsistent font sizes across panels and misaligned graphical elements. This package addresses these problems by enabling the creation of figure panels at their intended final size, with an automated workflow that allows for easy recreation and resizing while maintaining visual consistency.
-
-## Project structure
-```text
-project-root/
-├── src/
-│   ├── mpl_panel_builder/  # Installable shared package
-│   │   ├── __init__.py
-│   │   ├── panel_builder.py
-│   │   └── panel_builder_config.py
-├── tests/
-│   ├── __init__.py
-│   ├── conftest.py
-│   ├── test_panel_builder.py
-│   └── test_panel_builder_config.py
-├── examples/               # Example usage and demonstrations
-│   ├── config_visualization/   # Example showing configuration options
-│   │   ├── create_panels.py    # Script to generate individual panels
-│   │   ├── create_figure.py    # Script to run panel creation + LaTeX
-│   │   └── figure.tex          # TikZ/LaTeX file for panel assembly
-│   ├── tikz_settings.tex   # Shared TikZ settings for all examples
-│   ├── helpers.py          # Utility functions for example scripts
-│   └── README.md           # Examples documentation
-├── outputs/                # Generated content
-├── config.yaml             # Panel configuration file for example usage
-
-├── environment.yml         # Conda environment file
-├── poetry.lock             # Locked dependencies  
-├── pyproject.toml          # Project definition
-
-├── README.md               # README
-└── LICENSE                 # License file
-```
+`mpl-panel-builder` helps you compose publication-quality figure panels with precise and repeatable layouts.  Panels are created by subclassing `PanelBuilder` and defining their size, margins and axes grid in centimeters.  A dataclass based configuration system keeps layout parameters and custom options in one place.  Example scripts show how panels can be combined via TikZ to produce complete figures.
 
 ## Installation
-The project uses Conda to create a Python 3.12 virtual environment, and Poetry to manage dependencies and packaging.
 
 ```bash
-# Clone the repository (e.g using SSH or by downloading it as a zip file)
-$ git clone git@github.com:NoviaIntSysGroup/mpl-panel-builder.git
+# clone repository
+$ git clone https://github.com/NoviaIntSysGroup/mpl-panel-builder.git
 $ cd mpl-panel-builder
-# Set up the Conda environment
+
+# create the conda environment and use it with Poetry
 $ conda env create -f environment.yml
 $ conda activate mpl-panel-builder
-# Tell Poetry to use the current Conda environment
 $ poetry config virtualenvs.create false
-# Install runtime dependencies
+
+# install package and notebook extras
 $ poetry install --with notebook
 ```
 
-## Usage
-See the example notebooks for how to create custom figure panels.
+## Example
 
-## Contribution
-Install the development dependencies:
+Run one of the demo scripts to generate panels and assemble them into a figure:
+
 ```bash
-# Install all dependencies including dev tools and notebooks
-poetry install --with dev,notebook
+python examples/config_visualization/create_figure.py
+```
 
-# Set up pre-commit hooks
+Generated files are stored under `outputs/`.
+
+## Repository layout
+
+```
+├── src/mpl_panel_builder/    # Library code
+├── examples/                 # Demo scripts and LaTeX templates
+├── outputs/                  # Generated content
+├── tests/                    # Test suite
+```
+
+## Development
+
+Install development requirements and set up the hooks:
+
+```bash
+poetry install --with dev,notebook
 poetry run pre-commit install --hook-type pre-commit --hook-type pre-push
 ```
-and follow the guidelines below to maintain code quality and consistency across the project. The pre-commit hook runs linters (ruff, mypy) on each commit. The pre-push hook runs the test suite (pytest) before each push.
 
-### Code Style
-Use [Google-style docstrings](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings) for all public modules, functions, classes, and methods.
-
-### Linting & Type Checking
-The project uses the following tools to enforce code quality:
-
-- [`ruff`](https://docs.astral.sh/ruff/) – A fast Python linter to ensure consistent code style and catch common issues.
-- [`mypy`](https://mypy-lang.org/) – A static type checker for Python.
-
-To run these checks locally:
+Before committing or pushing run:
 
 ```bash
-# Lint with ruff
 poetry run ruff check .
-
-# Type-check with mypy
 poetry run mypy .
-```
-
-### Testing
-The project uses [pytest](https://docs.pytest.org/) for unit testing. To run the tests locally:
-
-```bash
 poetry run pytest
-poetry run pytest --cov=mpl_panel_builder
 ```
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is released under the [MIT License](LICENSE).
