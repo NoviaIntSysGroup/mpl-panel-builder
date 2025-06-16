@@ -32,10 +32,10 @@ def make_dummy_panel_class(
         "DummyPanel",
         (PanelBuilder,),
         {
-            "panel_name": panel_name,
-            "n_rows": n_rows,
-            "n_cols": n_cols,
-            "build_panel": lambda self: self.axs_grid[0][0].plot([0, 1], [0, 1]),
+            "_panel_name": panel_name,
+            "_n_rows": n_rows,
+            "_n_cols": n_cols,
+            "build_panel": lambda self: self.axs[0][0].plot([0, 1], [0, 1]),
         }
     )
 
@@ -96,20 +96,20 @@ def test_fig_property_raises_before_build(sample_config_dict: ConfigDict) -> Non
         _ = builder.fig
 
 
-def test_axs_grid_property_raises_before_build(sample_config_dict: ConfigDict) -> None:
-    """Ensure axs_grid raises if accessed before creation.
+def test_axs_property_raises_before_build(sample_config_dict: ConfigDict) -> None:
+    """Ensure axs raises if accessed before creation.
     
     Args:
         sample_config_dict: A configuration dictionary for panel building.
         
     Raises:
-        RuntimeError: When accessing the axs_grid property before building the figure.
+        RuntimeError: When accessing the axs property before building the figure.
     """
 
     dummy_builder = make_dummy_panel_class()
     builder = dummy_builder(sample_config_dict)
     with pytest.raises(RuntimeError):
-        _ = builder.axs_grid
+        _ = builder.axs
 
 
 @pytest.mark.parametrize("n_rows,n_cols", [
@@ -118,12 +118,12 @@ def test_axs_grid_property_raises_before_build(sample_config_dict: ConfigDict) -
     (3, 1),
     (1, 3),
 ])
-def test_axs_grid_has_correct_dimensions(
+def test_axs_has_correct_dimensions(
     n_rows: int, 
     n_cols: int, 
     sample_config_dict: ConfigDict
 ) -> None:
-    """Ensure axs_grid has the correct dimensions after building.
+    """Ensure axs has the correct dimensions after building.
     
     Args:
         n_rows: Number of rows in the panel grid.
@@ -138,9 +138,9 @@ def test_axs_grid_has_correct_dimensions(
     builder = dummy_builder(sample_config_dict)
     _ = builder()
 
-    axs_grid = builder.axs_grid
-    assert len(axs_grid) == n_rows
-    for row in axs_grid:
+    axs = builder.axs
+    assert len(axs) == n_rows
+    for row in axs:
         assert len(row) == n_cols
 
 
@@ -157,7 +157,7 @@ def test_fig_has_correct_margins(sample_config_dict: ConfigDict) -> None:
     dummy_builder = make_dummy_panel_class()
     builder = dummy_builder(sample_config_dict)
     _ = builder()
-    ax = builder.axs_grid[0][0]
+    ax = builder.axs[0][0]
 
     # Expected positions in figure coordinates (normalized 0–1)
     total_width_cm = sample_config_dict["panel_dimensions_cm"]["width"]
@@ -185,12 +185,12 @@ def test_filename_suffix(
     """Suffix returned from ``build_panel`` is appended to ``panel_name``."""
 
     class CustomPanel(PanelBuilder):
-        panel_name = "dummy_panel"
-        n_rows = 1
-        n_cols = 1
+        _panel_name = "dummy_panel"
+        _n_rows = 1
+        _n_cols = 1
 
         def build_panel(self, suffix: str | None = None) -> str | None:
-            self.axs_grid[0][0].plot([0, 1], [0, 1])
+            self.axs[0][0].plot([0, 1], [0, 1])
             return suffix
 
     config = dict(sample_config_dict)

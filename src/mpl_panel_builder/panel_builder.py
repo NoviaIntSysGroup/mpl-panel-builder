@@ -24,8 +24,13 @@ class PanelBuilder:
         n_rows (int): Number of subplot rows defined by the user.
         n_cols (int): Number of subplot columns defined by the user.
         fig (Optional[MatplotlibFigure]): Created matplotlib figure object.
-        axs_grid (Optional[List[List[MatplotlibAxes]]]): Grid of axes objects.
+        axs (Optional[List[List[MatplotlibAxes]]]): Grid of axes objects.
     """
+
+    # Private class attributes that must be defined by subclasses
+    _panel_name: str
+    _n_rows: int
+    _n_cols: int
 
     def __init__(self, config: dict[str, Any], debug: bool = False):
         """Initializes the PanelBuilder with config and grid layout.
@@ -37,12 +42,9 @@ class PanelBuilder:
         """
         self.config = PanelBuilderConfig.from_dict(config)
         self.debug = debug
-        self.panel_name: str = type(self).panel_name
-        self.n_rows: int = type(self).n_rows
-        self.n_cols: int = type(self).n_cols
 
         self._fig: MatplotlibFigure | None = None
-        self._axs_grid: list[list[MatplotlibAxes]] | None = None
+        self._axs: list[list[MatplotlibAxes]] | None = None
 
     def __init_subclass__(cls) -> None:
         """Validates that subclasses define required class attributes.
@@ -59,7 +61,7 @@ class PanelBuilder:
                 n_cols.
         """
         super().__init_subclass__()
-        required_attrs = ["panel_name", "n_rows", "n_cols"]
+        required_attrs = ["_panel_name", "_n_rows", "_n_cols"]
         missing = [attr for attr in required_attrs if not hasattr(cls, attr)]
         if missing:
             raise TypeError(
@@ -82,12 +84,12 @@ class PanelBuilder:
         with plt.rc_context(rc=style_context):
             self._fig = self.create_fig()
             self.draw_debug_lines()
-            self._axs_grid = self.create_axes()
+            self._axs = self.create_axes()
             filename_suffix = self.build_panel(*args, **kwargs)
-            self.save_fig(filename_suffix if isinstance(filename_suffix, str) else None)
+            self.save_fig(filename_suffix)
         return self.fig
 
-    def build_panel(self, *args: Any, **kwargs: Any) -> Any:
+    def build_panel(self, *args: Any, **kwargs: Any) -> str | None:
         """Populates the panel with plot content.
 
         Subclasses should implement their plotting logic here.  The return value
@@ -201,7 +203,7 @@ class PanelBuilder:
         ]
 
         # Create the axes
-        axs_grid: list[list[MatplotlibAxes]] = []
+        axs: list[list[MatplotlibAxes]] = []
         ax_x_left = plot_left  # left edge of plot region
         ax_y_top = plot_bottom + plot_height  # top edge of plot region
 
@@ -225,9 +227,9 @@ class PanelBuilder:
                 ax = self.fig.add_axes(ax_pos, aspect="auto")
                 row_axes.append(ax)
 
-            axs_grid.append(row_axes)
+            axs.append(row_axes)
 
-        return axs_grid
+        return axs
     
     def draw_debug_lines(self) -> None:
         """Draws debug lines on the axes to help with layout debugging.
@@ -311,7 +313,6 @@ class PanelBuilder:
                 panel_name = f"{panel_name}_{filename_suffix}"
             self.fig.savefig(directory / f"{panel_name}.{file_format}", dpi=dpi)
         
-
     @property
     def fig(self) -> MatplotlibFigure:
         """matplotlib.figure.Figure: The figure object, guaranteed to be initialized.
@@ -324,12 +325,27 @@ class PanelBuilder:
         return self._fig
 
     @property
-    def axs_grid(self) -> list[list[MatplotlibAxes]]:
+    def axs(self) -> list[list[MatplotlibAxes]]:
         """List[List[matplotlib.axes.Axes]]: The grid of axes, guaranteed to exist.
 
         Raises:
             RuntimeError: If the axes grid has not been created yet.
         """
-        if self._axs_grid is None:
+        if self._axs is None:
             raise RuntimeError("Axes grid has not been created yet.")
-        return self._axs_grid
+        return self._axs
+    
+    @property
+    def panel_name(self) -> str:
+        """str: The name of the panel, read-only."""
+        return type(self)._panel_name
+
+    @property
+    def n_rows(self) -> int:
+        """int: The number of rows in the panel grid, read-only."""
+        return type(self)._n_rows
+
+    @property
+    def n_cols(self) -> int:
+        """int: The number of columns in the panel grid, read-only."""
+        return type(self)._n_cols

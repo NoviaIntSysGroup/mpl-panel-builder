@@ -6,6 +6,16 @@
 ![Ruff](https://img.shields.io/badge/linter-ruff-0098db)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
+## Motivation
+This project provides a framework for creating publication-ready figures with consistent layouts and precise control over visual elements. The core principles underlying the package are:
+
+1. **Consistent Layout**: All figure panels within a publication should maintain uniform layouts with properly aligned elements by default.
+2. **Reproducible Workflow**: Complete figures should be reproducible through a single script execution.
+3. **Centralized Configuration**: Analysis and layout parameters should be defined in a single location.
+4. **Automated Updates**: All manuscript figures should update automatically or by running a single script whener analysis or layout parameters change.
+
+A common issue in scientific publications is the manual assembly of figures through copy-paste operations and arbitrary resizing, leading to inconsistent font sizes across panels and misaligned graphical elements. This package addresses these problems by enabling the creation of figure panels at their intended final size, with an automated workflow that allows for easy recreation and resizing while maintaining visual consistency.
+
 ## Project structure
 ```text
 project-root/
@@ -19,22 +29,15 @@ project-root/
 │   ├── conftest.py
 │   ├── test_panel_builder.py
 │   └── test_panel_builder_config.py
-├── examples/               # Jupyter notebooks for usage & examples
-│   ├── file_helpers.py
-│   └── usage_demo.ipynb    # Example usage
-├── tikz/                   # TikZ files for assemblying panels
-│   ├── usage_demo.tex      # Example usage
-│   └──  tikz_settings.tex   # TikZ settings and style definitions
-├── outputs/                    # Generated content
-│   ├── panels/                 # Individual matplotlib panels
-│   │   ├── panel_a.pdf
-│   │   ├── panel_b.png
-│   │   └── panel_c.svg
-│   ├── figures/                # Complete assembled figures
-│   │   ├── figure_1.pdf
-│   │   ├── figure_2.png
-│   │   └── demo_figure.pdf
-│   └── readme_assets/          # Figures specifically for README
+├── examples/               # Example usage and demonstrations
+│   ├── config_visualization/   # Example showing configuration options
+│   │   ├── create_panels.py    # Script to generate individual panels
+│   │   ├── create_figure.py    # Script to run panel creation + LaTeX
+│   │   └── figure.tex          # TikZ/LaTeX file for panel assembly
+│   ├── tikz_settings.tex   # Shared TikZ settings for all examples
+│   ├── helpers.py          # Utility functions for example scripts
+│   └── README.md           # Examples documentation
+├── outputs/                # Generated content
 ├── config.yaml             # Panel configuration file for example usage
 
 ├── environment.yml         # Conda environment file

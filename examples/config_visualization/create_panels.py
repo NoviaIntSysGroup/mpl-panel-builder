@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
 from typing import Any
 
-import matplotlib.pyplot as plt
 import numpy as np
-from file_helpers import get_project_root
+
+# Add the examples directory to sys.path to allow importing helpers module
+sys.path.append(str(Path(__file__).parent.parent.absolute()))
+from helpers import get_project_root
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
@@ -15,6 +19,8 @@ from mpl_panel_builder.panel_builder import PanelBuilder
 # Define panel configuration
 margin = 1
 project_root = get_project_root()
+current_dir = Path(__file__).parent
+example_name = current_dir.name
 config = {
     "panel_dimensions_cm": {"width": 6.0, "height": 5.0},
     "panel_margins_cm": {
@@ -26,14 +32,16 @@ config = {
     "font_sizes_pt": {"axes": 8, "text": 6},
     "ax_separation_cm": {"x": 0.5, "y": 0.5},
     "panel_output": {
-        "directory": project_root / "outputs" / "panels",
+        "directory": project_root / "outputs" / example_name / "panels",
         "format": "pdf",
         "dpi": 600,
     },
 }
 
+# Create output directory if it doesn't exist
+config["panel_output"]["directory"].mkdir(parents=True, exist_ok=True)  # type: ignore
 
-# Helper functions
+# Example specific helper functions
 
 def add_full_panel_axes(fig: Figure) -> Axes:
     """Add an invisible axes covering the entire figure.
@@ -52,7 +60,11 @@ def add_full_panel_axes(fig: Figure) -> Axes:
 
 
 def plot_sinusoid(ax: Axes) -> None:
-    """Plot a simple sinusoid on *ax*."""
+    """Plot a simple sinusoid.
+
+    Args:
+        ax: Axes to plot the sinusoid on.
+    """
 
     x = np.linspace(0, 5 * np.pi, 100)
     y = np.sin(x)
@@ -63,7 +75,7 @@ def plot_sinusoid(ax: Axes) -> None:
 
 
 class DimPanelDemo(PanelBuilder):
-    """One panel showing panel dimensions."""
+    """1 by 1 panel showing panel dimensions."""
 
     n_cols = 1
     n_rows = 1
@@ -72,7 +84,7 @@ class DimPanelDemo(PanelBuilder):
     def build_panel(self) -> None:
         """Create custom content for the panel."""
 
-        plot_sinusoid(self.axs_grid[0][0])
+        plot_sinusoid(self.axs[0][0])
 
         ax_panel = add_full_panel_axes(self.fig)
         ax_panel.plot([0, 1], [0.001, 0.001], "k:")
@@ -90,7 +102,7 @@ class DimPanelDemo(PanelBuilder):
 
 
 class MarginPanelDemo(PanelBuilder):
-    """One panel illustrating panel margins."""
+    """1 by 1 panel illustrating panel margins."""
 
     n_cols = 1
     n_rows = 1
@@ -99,7 +111,7 @@ class MarginPanelDemo(PanelBuilder):
     def build_panel(self) -> None:
         """Create custom content for the panel."""
 
-        plot_sinusoid(self.axs_grid[0][0])
+        plot_sinusoid(self.axs[0][0])
 
         margins_cm = self.config.panel_margins_cm
         dims_cm = self.config.panel_dimensions_cm
@@ -132,7 +144,7 @@ class MarginPanelDemo(PanelBuilder):
 
 
 class AxesSeparationPanelDemo(PanelBuilder):
-    """Two by two panel showing axes separation."""
+    """2 by 2 panel showing axes separation."""
 
     n_cols = 2
     n_rows = 2
@@ -143,17 +155,17 @@ class AxesSeparationPanelDemo(PanelBuilder):
 
         for i in range(self.n_cols):
             for j in range(self.n_rows):
-                plot_sinusoid(self.axs_grid[i][j])
+                plot_sinusoid(self.axs[i][j])
 
         ax_panel = add_full_panel_axes(self.fig)
 
-        ax_00_x1 = self.axs_grid[0][0].get_position().x1
-        ax_01_x0 = self.axs_grid[0][1].get_position().x0
+        ax_00_x1 = self.axs[0][0].get_position().x1
+        ax_01_x0 = self.axs[0][1].get_position().x0
         ax_panel.plot([ax_00_x1, ax_00_x1], [0, 1], "k:")
         ax_panel.plot([ax_01_x0, ax_01_x0], [0, 1], "k:")
 
-        ax_00_y1 = self.axs_grid[0][0].get_position().y0
-        ax_10_y0 = self.axs_grid[1][0].get_position().y1
+        ax_00_y1 = self.axs[0][0].get_position().y0
+        ax_10_y0 = self.axs[1][0].get_position().y1
         ax_panel.plot([0, 1], [ax_00_y1, ax_00_y1], "k:")
         ax_panel.plot([0, 1], [ax_10_y0, ax_10_y0], "k:")
 
@@ -171,7 +183,7 @@ class AxesSeparationPanelDemo(PanelBuilder):
 
 
 class FontSizePanelDemo(PanelBuilder):
-    """One panel demonstrating configured font sizes."""
+    """1 by 1 panel demonstrating configured font sizes."""
 
     n_cols = 1
     n_rows = 1
@@ -180,15 +192,15 @@ class FontSizePanelDemo(PanelBuilder):
     def build_panel(self) -> None:
         """Create custom content for the panel."""
 
-        plot_sinusoid(self.axs_grid[0][0])
-        self.axs_grid[0][0].set(
+        plot_sinusoid(self.axs[0][0])
+        self.axs[0][0].set(
             xlabel="axes",
             ylabel="axes",
             title="axes",
         )
-        self.axs_grid[0][0].legend(loc="lower right")
+        self.axs[0][0].legend(loc="lower right")
         sample_text = "text\ntext\ntext\ntext"
-        self.axs_grid[0][0].text(0.1, -0.9, sample_text, va="bottom", ha="left")
+        self.axs[0][0].text(0.1, -0.9, sample_text, va="bottom", ha="left")
 
 
 if __name__ == "__main__":
@@ -198,7 +210,7 @@ if __name__ == "__main__":
         AxesSeparationPanelDemo,
         FontSizePanelDemo,
     ]
-    for builder_cls in builders:
-        fig = builder_cls(config)()
-        fig.show()
-    plt.close("all")
+
+    for builder_class in builders:
+        builder = builder_class(config)
+        builder()
