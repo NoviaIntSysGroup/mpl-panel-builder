@@ -4,6 +4,7 @@ version = "0.0.0"  # Placeholder, overridden by git tag
 description = "Matplotlib based figure panel builder"
 authors = ["Johan Westö <johan.westo@gmail.com>"]
 readme = "README.md"
+repository = "https://github.com/NoviaIntSysGroup/mpl-panel-builder"
 packages = [{ include = "mpl_panel_builder", from = "src" }]
 
 [tool.poetry.dependencies]

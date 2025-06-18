@@ -27,6 +27,18 @@
 
 ## Installation
 
+### From PyPI (recommended)
+
+To use `mpl-panel-builder` in your project, install it from PyPI:
+
+```bash
+pip install mpl-panel-builder
+```
+
+### From source (for examples and development)
+
+If you want to explore the examples or contribute to the project, follow these steps to install from source:
+
 ```bash
 # clone repository
 $ git clone https://github.com/NoviaIntSysGroup/mpl-panel-builder.git
