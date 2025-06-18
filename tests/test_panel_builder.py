@@ -1,4 +1,5 @@
-from typing import TypeAlias
+import pathlib
+from typing import Any, TypeAlias
 
 import matplotlib
 import pytest
@@ -8,15 +9,22 @@ from matplotlib.figure import Figure as MatplotlibFigure
 
 from mpl_panel_builder.panel_builder import PanelBuilder
 
-ConfigDict: TypeAlias = dict[str, dict[str, float]]
+ConfigDict: TypeAlias = dict[str, dict[str, Any]]
 
 
-def make_dummy_panel_class(n_rows: int = 1, n_cols: int = 1) -> type[PanelBuilder]:
+def make_dummy_panel_class(
+    panel_name: str = "dummy_panel",
+    n_rows: int = 1, 
+    n_cols: int = 1,
+    suffix: str | None = None
+) -> type[PanelBuilder]:
     """Create a dummy PanelBuilder subclass for testing.
     
     Args:
+        panel_name: Name of the panel to use for saving the figure.
         n_rows: Number of rows in the panel grid.
         n_cols: Number of columns in the panel grid.
+        suffix: Optional suffix to append to the panel name.
         
     Returns:
         A PanelBuilder subclass with the specified dimensions.
@@ -26,25 +34,40 @@ def make_dummy_panel_class(n_rows: int = 1, n_cols: int = 1) -> type[PanelBuilde
         "DummyPanel",
         (PanelBuilder,),
         {
-            "n_rows": n_rows,
-            "n_cols": n_cols,
-            "build_panel": lambda self: self.axs_grid[0][0].plot([0, 1], [0, 1]),
+            "_panel_name": panel_name,
+            "_n_rows": n_rows,
+            "_n_cols": n_cols,
+            "build_panel": lambda self, suffix=suffix: (
+                self.axs[0][0].plot([0, 1], [0, 1]), suffix
+            )[1],
         }
     )
 
-
-def test_subclass_validation_raises_without_n_rows_n_cols() -> None:
-    """Ensure PanelBuilder subclass requires n_rows and n_cols.
+# Tests for PanelBuilder
+@pytest.mark.parametrize("missing_attr", ["_panel_name", "_n_rows", "_n_cols"])
+def test_subclass_validation_raises_without_required_attributes(
+    missing_attr: str
+) -> None:
+    """Ensure PanelBuilder subclass requires all required attributes.
     
+    Args:
+        missing_attr: The attribute to omit from the test class.
+        
     Raises:
         TypeError: When attempting to create a PanelBuilder subclass without 
-            defining n_rows and n_cols class attributes.
+            defining all required class attributes.
     """
-
-    with pytest.raises(TypeError):
-
-        class InvalidPanel(PanelBuilder):
-            pass
+    # Create a class dict with all required attributes
+    class_dict = {
+        "_panel_name": "test_panel",
+        "_n_rows": 1,
+        "_n_cols": 1
+    }
+    # Remove the attribute we're testing
+    del class_dict[missing_attr]
+    
+    with pytest.raises(TypeError, match=missing_attr):
+        type("InvalidPanel", (PanelBuilder,), class_dict)
 
 
 def test_build_returns_matplotlib_figure(sample_config_dict: ConfigDict) -> None:
@@ -52,9 +75,6 @@ def test_build_returns_matplotlib_figure(sample_config_dict: ConfigDict) -> None
     
     Args:
         sample_config_dict: A configuration dictionary for panel building.
-        
-    Returns:
-        None
     """
 
     dummy_builder = make_dummy_panel_class()
@@ -79,20 +99,20 @@ def test_fig_property_raises_before_build(sample_config_dict: ConfigDict) -> Non
         _ = builder.fig
 
 
-def test_axs_grid_property_raises_before_build(sample_config_dict: ConfigDict) -> None:
-    """Ensure axs_grid raises if accessed before creation.
+def test_axs_property_raises_before_build(sample_config_dict: ConfigDict) -> None:
+    """Ensure axs raises if accessed before creation.
     
     Args:
         sample_config_dict: A configuration dictionary for panel building.
         
     Raises:
-        RuntimeError: When accessing the axs_grid property before building the figure.
+        RuntimeError: When accessing the axs property before building the figure.
     """
 
     dummy_builder = make_dummy_panel_class()
     builder = dummy_builder(sample_config_dict)
     with pytest.raises(RuntimeError):
-        _ = builder.axs_grid
+        _ = builder.axs
 
 
 @pytest.mark.parametrize("n_rows,n_cols", [
@@ -101,12 +121,12 @@ def test_axs_grid_property_raises_before_build(sample_config_dict: ConfigDict) -
     (3, 1),
     (1, 3),
 ])
-def test_axs_grid_has_correct_dimensions(
+def test_axs_has_correct_dimensions(
     n_rows: int, 
     n_cols: int, 
     sample_config_dict: ConfigDict
 ) -> None:
-    """Ensure axs_grid has the correct dimensions after building.
+    """Ensure axs has the correct dimensions after building.
     
     Args:
         n_rows: Number of rows in the panel grid.
@@ -117,13 +137,13 @@ def test_axs_grid_has_correct_dimensions(
         None
     """
 
-    dummy_builder = make_dummy_panel_class(n_rows, n_cols)
+    dummy_builder = make_dummy_panel_class(n_rows=n_rows, n_cols=n_cols)
     builder = dummy_builder(sample_config_dict)
     _ = builder()
 
-    axs_grid = builder.axs_grid
-    assert len(axs_grid) == n_rows
-    for row in axs_grid:
+    axs = builder.axs
+    assert len(axs) == n_rows
+    for row in axs:
         assert len(row) == n_cols
 
 
@@ -140,7 +160,7 @@ def test_fig_has_correct_margins(sample_config_dict: ConfigDict) -> None:
     dummy_builder = make_dummy_panel_class()
     builder = dummy_builder(sample_config_dict)
     _ = builder()
-    ax = builder.axs_grid[0][0]
+    ax = builder.axs[0][0]
 
     # Expected positions in figure coordinates (normalized 0–1)
     total_width_cm = sample_config_dict["panel_dimensions_cm"]["width"]
@@ -160,3 +180,28 @@ def test_fig_has_correct_margins(sample_config_dict: ConfigDict) -> None:
     assert pytest.approx(ax.get_position().y0) == expected_y
     assert pytest.approx(ax.get_position().width) == expected_width
     assert pytest.approx(ax.get_position().height) == expected_height
+
+
+def test_filename_suffix(
+    tmp_path: pathlib.Path, sample_config_dict: ConfigDict
+) -> None:
+    """Suffix returned from ``build_panel`` is appended to ``panel_name``."""
+
+    config = dict(sample_config_dict)
+    config["panel_output"] = {
+        "directory": str(tmp_path),
+        "format": "png",
+        "dpi": 72,
+    }
+
+    # Without suffix → default filename
+    dummy_builder = make_dummy_panel_class()
+    builder = dummy_builder(config)
+    builder()
+    assert (tmp_path / "dummy_panel.png").exists()
+
+    # With suffix → suffix appended
+    dummy_builder = make_dummy_panel_class(suffix="alt")
+    builder = dummy_builder(config)
+    builder()
+    assert (tmp_path / "dummy_panel_alt.png").exists()

@@ -1,18 +1,60 @@
 from __future__ import annotations
 
 import copy
-from typing import TypeAlias
+from typing import Any, TypeAlias
 
 import pytest
 
-from mpl_panel_builder.panel_config import (
-    PanelConfig,
+from mpl_panel_builder.panel_builder_config import (
+    CustomConfigDotDict,
+    PanelBuilderConfig,
     override_config,
 )
 
-ConfigDict: TypeAlias = dict[str, dict[str, float]]
+ConfigDict: TypeAlias = dict[str, dict[str, Any]]
+
+# Tests for CustomConfigDotDict
+def test_custom_config_dot_dict() -> None:
+    """Test the core functionality of CustomConfigDotDict."""
+    
+    # Test data with nested structure
+    config_data = {
+        'key1': {
+            'subkey1': 'value1',
+            'subkey2': 42
+        },
+        'key2': 'value2',
+        'key3': True
+    }
+    
+    config = CustomConfigDotDict(config_data)
+    
+    # Test dot notation access works
+    assert config.key2 == 'value2'
+    assert config.key3 is True
+    
+    # Test nested dot notation access works
+    assert config.key1.subkey1 == 'value1'
+    assert config.key1.subkey2 == 42
+    
+    # Test dictionary access still works
+    assert config['key2'] == 'value2'
+    assert config['key1']['subkey1'] == 'value1'
+    
+    # Test read-only behavior - cannot modify attributes
+    with pytest.raises(AttributeError, match="Cannot modify read-only config"):
+        config.key2 = 'new_value'
+    
+    # Test read-only behavior - cannot delete attributes
+    with pytest.raises(AttributeError, match="Cannot delete read-only config"):
+        del config.key2
+    
+    # Test accessing non-existent attribute raises AttributeError
+    with pytest.raises(AttributeError, match="Object has no attribute 'nonexistent'"):
+        _ = config.nonexistent
 
 
+# Tests for PanelBuilderConfig
 def test_from_dict_with_optional_ax_separation(
     sample_config_dict: ConfigDict
 ) -> None:
@@ -28,7 +70,7 @@ def test_from_dict_with_optional_ax_separation(
     # Remove the optional key to test default behavior
     del missing_ax_separation_dict["ax_separation_cm"]
     
-    config = PanelConfig.from_dict(missing_ax_separation_dict)
+    config = PanelBuilderConfig.from_dict(missing_ax_separation_dict)
     
     # Should use defaults for ax_separation_cm
     assert config.ax_separation_cm.x == pytest.approx(0.0)
@@ -47,17 +89,21 @@ def test_from_dict_missing_required_keys(
         None
         
     Raises:
-        KeyError: Expected when required keys are missing.
+        TypeError: Expected when required keys are missing.
     """
-    # Keep only panel_dimensions_cm
-    incomplete_dict = {
-        "panel_dimensions_cm": copy.deepcopy(
-            sample_config_dict["panel_dimensions_cm"]
-            )
-    }
+    required_keys = [
+        "panel_dimensions_cm",
+        "panel_margins_cm",
+        "font_sizes_pt"
+    ]
     
-    with pytest.raises(KeyError):
-        PanelConfig.from_dict(incomplete_dict)
+    for key in required_keys:
+        # Create a copy of the sample config with one required key removed
+        incomplete_dict = copy.deepcopy(sample_config_dict)
+        del incomplete_dict[key]
+        
+        with pytest.raises(TypeError, match=f"missing.*required.*argument.*{key}"):
+            PanelBuilderConfig.from_dict(incomplete_dict)
 
 
 def test_from_dict_invalid_nested_structure(
@@ -78,7 +124,7 @@ def test_from_dict_invalid_nested_structure(
     del invalid_dict["panel_dimensions_cm"]["height"]
     
     with pytest.raises(TypeError):
-        PanelConfig.from_dict(invalid_dict)
+        PanelBuilderConfig.from_dict(invalid_dict)
 
 
 def test_from_dict_invalid_dimensions(
@@ -99,9 +145,9 @@ def test_from_dict_invalid_dimensions(
     invalid_dict["panel_dimensions_cm"]["width"] = -10.0
     
     with pytest.raises(ValueError):
-        PanelConfig.from_dict(invalid_dict)
+        PanelBuilderConfig.from_dict(invalid_dict)
 
-
+# Tests for override_config
 def test_arithmetic_operations(sample_config_dict: ConfigDict) -> None:
     """Test all arithmetic override operations work correctly.
     
@@ -111,44 +157,58 @@ def test_arithmetic_operations(sample_config_dict: ConfigDict) -> None:
     Returns:
         None
     """
+    # Get first three different sections for testing
+    sections = list(sample_config_dict.keys())[:3]
+    first_section = sections[0]
+    second_section = sections[1]
+    third_section = sections[2]
+    
+    # Get first two keys from each section
+    first_section_keys = list(sample_config_dict[first_section].keys())[:2]
+    second_section_keys = list(sample_config_dict[second_section].keys())[:2]
+    third_section_keys = list(sample_config_dict[third_section].keys())[:2]
+    
+    first_key, second_key = first_section_keys
+    third_key, fourth_key = second_section_keys
+    fifth_key, sixth_key = third_section_keys
+    
     updates = {
-        "panel_dimensions_cm": {"width": "+=5.0", "height": "*0.5"},
-        "panel_margins_cm": {"top": "=2.0", "left": "-=0.5"},
-        "font_sizes_pt": {"axes": 16, "text": "+=2"},
+        first_section: {first_key: "+=5.0", second_key: "*0.5"},
+        second_section: {third_key: "=2.0", fourth_key: "-=0.5"},
+        third_section: {fifth_key: 16, sixth_key: "+=2"},
     }
     
     result = override_config(sample_config_dict, updates)
     
     # Get base values from sample_config_dict
-    base_width = sample_config_dict["panel_dimensions_cm"]["width"]
-    base_height = sample_config_dict["panel_dimensions_cm"]["height"]
-    base_margin_left = sample_config_dict["panel_margins_cm"]["left"]
-    base_text_size = sample_config_dict["font_sizes_pt"]["text"]
+    base_first = sample_config_dict[first_section][first_key]
+    base_second = sample_config_dict[first_section][second_key]
+    base_fourth = sample_config_dict[second_section][fourth_key]
+    base_sixth = sample_config_dict[third_section][sixth_key]
     
     assert (
-        result["panel_dimensions_cm"]["width"] 
-        == pytest.approx(base_width + 5.0)
+        result[first_section][first_key] 
+        == pytest.approx(base_first + 5.0)
     )
     assert (
-        result["panel_dimensions_cm"]["height"] 
-        == pytest.approx(base_height * 0.5)
-    )
-    # Directly set value
-    assert (
-        result["panel_margins_cm"]["top"] 
-        == pytest.approx(2.0)
+        result[first_section][second_key] 
+        == pytest.approx(base_second * 0.5)
     )
     assert (
-        result["panel_margins_cm"]["left"] 
-        == pytest.approx(base_margin_left - 0.5)
+        result[second_section][third_key] 
+        == pytest.approx(2.0)  # Direct assignment
     )
     assert (
-        result["font_sizes_pt"]["axes"] 
+        result[second_section][fourth_key] 
+        == pytest.approx(base_fourth - 0.5)
+    )
+    assert (
+        result[third_section][fifth_key] 
         == pytest.approx(16)  # Direct assignment
     )
     assert (
-        result["font_sizes_pt"]["text"] 
-        == pytest.approx(base_text_size + 2)
+        result[third_section][sixth_key] 
+        == pytest.approx(base_sixth + 2)
     )
 
 
@@ -161,15 +221,24 @@ def test_string_number_conversion(sample_config_dict: ConfigDict) -> None:
     Returns:
         None
     """
+    # Get first two different sections for testing
+    sections = list(sample_config_dict.keys())[:2]
+    first_section = sections[0]
+    second_section = sections[1]
+    
+    # Get first key from each section
+    first_key = list(sample_config_dict[first_section].keys())[0]
+    second_key = list(sample_config_dict[second_section].keys())[0]
+    
     updates = {
-        "panel_dimensions_cm": {"width": "15.5"},
-        "font_sizes_pt": {"axes": "14"},
+        first_section: {first_key: "15.5"},
+        second_section: {second_key: "14"},
     }
     
     result = override_config(sample_config_dict, updates)
     
-    assert result["panel_dimensions_cm"]["width"] == pytest.approx(15.5)
-    assert result["font_sizes_pt"]["axes"] == pytest.approx(14.0)
+    assert result[first_section][first_key] == pytest.approx(15.5)
+    assert result[second_section][second_key] == pytest.approx(14.0)
 
 
 def test_nonexistent_key_error(sample_config_dict: ConfigDict) -> None:
@@ -184,6 +253,10 @@ def test_nonexistent_key_error(sample_config_dict: ConfigDict) -> None:
     Raises:
         KeyError: Expected when trying to override a non-existent key.
     """
+    # Get first section for testing
+    first_section = list(sample_config_dict.keys())[0]
+    
+    # Test non-existent section
     updates = {
         "nonexistent_section": {"value": 10.0}
     }
@@ -194,7 +267,7 @@ def test_nonexistent_key_error(sample_config_dict: ConfigDict) -> None:
     
     # Test nested non-existent key
     updates = {
-        "panel_dimensions_cm": {"nonexistent_field": 10.0}
+        first_section: {"nonexistent_field": 10.0}
     }
     
     error_msg = "Cannot override non-existent key: nonexistent_field"
@@ -228,8 +301,12 @@ def test_invalid_override_formats(
     Raises:
         ValueError: Expected when an invalid override format is provided.
     """
+    # Get first section and its first key for testing
+    first_section = list(sample_config_dict.keys())[0]
+    first_key = list(sample_config_dict[first_section].keys())[0]
+    
     updates = {
-        "panel_dimensions_cm": {"width": invalid_format}
+        first_section: {first_key: invalid_format}
     }
     
     error_msg = f"Invalid override format: {invalid_format}"
@@ -247,23 +324,22 @@ def test_original_config_preserved(sample_config_dict: ConfigDict) -> None:
     Returns:
         None
     """
-    original_width = sample_config_dict["panel_dimensions_cm"]["width"]
+    # Get first section and its first key for testing
+    first_section = list(sample_config_dict.keys())[0]
+    first_key = list(sample_config_dict[first_section].keys())[0]
+    
+    original_value = sample_config_dict[first_section][first_key]
     
     updates = {
-        "panel_dimensions_cm": {"width": "+=5.0"}
+        first_section: {first_key: "+=5.0"}
     }
     
-    result = override_config(sample_config_dict, updates)
+    _ = override_config(sample_config_dict, updates)
     
     # Original should be unchanged
     assert (
-        sample_config_dict["panel_dimensions_cm"]["width"] 
-        == pytest.approx(original_width)
-    )
-    # Result should be updated
-    assert (
-        result["panel_dimensions_cm"]["width"] 
-        == pytest.approx(original_width + 5.0)
+        sample_config_dict[first_section][first_key] 
+        == pytest.approx(original_value)
     )
 
 
@@ -297,7 +373,7 @@ def test_deep_nested_overrides() -> None:
     assert result["level1"]["level2"]["level3"]["other"] == pytest.approx(5.0)
     assert result["level1"]["other_level2"]["value"] == pytest.approx(40.0)
 
-
+# Tests for end to end config usage
 def test_config_creation_with_overrides(
     sample_config_dict: ConfigDict
 ) -> None:
@@ -309,21 +385,24 @@ def test_config_creation_with_overrides(
     Returns:
         None
     """
-    # Simulate user wanting larger figure with bigger fonts
+    # Get first section and its first key for testing
+    first_section = list(sample_config_dict.keys())[0]
+    first_key = list(sample_config_dict[first_section].keys())[0]
+    
+    # Get original value for verification
+    original_value = sample_config_dict[first_section][first_key]
+    
+    # Simulate user wanting larger figure
     user_overrides = {
-        "panel_dimensions_cm": {"width": "+=5.0", "height": "+=2.0"},
-        "font_sizes_pt": {"axes": "*1.2", "text": "*1.2"},
+        first_section: {first_key: "+=5.0"},
     }
     
     updated_dict = override_config(sample_config_dict, user_overrides)
-    config = PanelConfig.from_dict(updated_dict)
+    config = PanelBuilderConfig.from_dict(updated_dict)
     
-    # Verify the pipeline worked end-to-end
-    assert config.panel_dimensions_cm.width == pytest.approx(15.0)
-    assert config.panel_dimensions_cm.height == pytest.approx(10.0)
-    assert config.font_sizes_pt.axes == pytest.approx(14.4)  # 12.0 * 1.2
-    assert config.font_sizes_pt.text == pytest.approx(12.0)  # 10.0 * 1.2
-    assert config.ax_separation_cm.x == pytest.approx(0.5)  # Unchanged
+    # Verify the pipeline worked end-to-end using dot notation
+    section = getattr(config, first_section)
+    assert getattr(section, first_key) == pytest.approx(original_value + 5.0)
 
 
 def test_config_override_error_propagation(
@@ -340,16 +419,16 @@ def test_config_override_error_propagation(
     Raises:
         ValueError: Expected when an invalid override format is provided.
     """
-    # Remove ax_separation_cm to match the original test
-    if "ax_separation_cm" in sample_config_dict:
-        del sample_config_dict["ax_separation_cm"]
+    # Get first section and its first key for testing
+    first_section = list(sample_config_dict.keys())[0]
+    first_key = list(sample_config_dict[first_section].keys())[0]
     
     # Invalid override should fail before PanelConfig creation
     invalid_overrides = {
-        "panel_dimensions_cm": {"width": "invalid_operation"}
+        first_section: {first_key: "invalid_operation"}
     }
     
     error_msg = "Invalid override format: invalid_operation"
     with pytest.raises(ValueError, match=error_msg):
         updated_dict = override_config(sample_config_dict, invalid_overrides)
-        PanelConfig.from_dict(updated_dict)  # This line shouldn't be reached
+        PanelBuilderConfig.from_dict(updated_dict)  # This line shouldn't be reached

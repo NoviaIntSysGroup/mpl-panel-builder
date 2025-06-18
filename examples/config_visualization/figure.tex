@@ -1,0 +1,28 @@
+\documentclass[tikz, 11pt]{standalone}
+
+\input{../tikz_settings.tex}
+
+\newcommand{\vSep}{5mm}
+% Define the example name here
+\def\exampleName{config_visualization}
+
+\begin{document}
+\begin{tikzpicture}[x=\unit, y=\unit]
+
+% Panels
+\node[panel] (a) {\includegraphics[]{"../../outputs/\exampleName/panels/dim_panel"}};
+\node[panel, anchor=west](b) at (a.east) {\includegraphics[]{"../../outputs/\exampleName/panels/margin_panel"}};
+\node[panel, anchor=west](c) at (b.east) {\includegraphics[]{"../../outputs/\exampleName/panels/font_size_panel"}};
+
+% Keys
+\foreach \n/\t in {a/panel\_dimensions\_cm, b/panel\_margins\_cm, c/font\_sizes\_pt} {
+    \node[headingNode, anchor=south, yshift=0] at (\n.north) {\headingSize\t};
+}
+
+% Heading
+\node[headingNode, anchor=south, yshift=\vSep] (h1) at (b.north) {\figHeading{Config dict keys visually explained}};
+\draw[lineShort] (h1.west) -- (h1-|a.west);
+\draw[lineShort] (h1.east) -- (h1-|c.east);	
+
+\end{tikzpicture}
+\end{document}

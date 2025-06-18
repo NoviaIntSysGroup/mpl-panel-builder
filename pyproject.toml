@@ -29,17 +29,24 @@ mypy_path = ["src"]
 [tool.ruff]
 line-length = 88
 target-version = "py311"
+fix = true
+
+[tool.ruff.lint]
 select = ["E", "F", "I", "B", "N", "UP", "C4", "T20", "A"]
 ignore = ["E203"]
-fix = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--cov=mpl_panel_builder"
 pythonpath = ["src"]
+markers = [
+    "example: marks tests that verify example scripts (deselect with '-m \"not example\"')"
+]
 
 [tool.poetry-dynamic-versioning]
 enable = true
+vcs = "git"
+style = "pep440"
 
 [build-system]
 requires = ["poetry-core", "poetry-dynamic-versioning"]
