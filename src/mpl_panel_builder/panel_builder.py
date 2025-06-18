@@ -20,7 +20,6 @@ class PanelBuilder:
     Attributes:
         config (PanelConfig): Configuration object containing panel dimensions,
             margins, font sizes, and axis separation settings.
-        debug (bool): Whether to draw debug grid lines for layout assistance.
         panel_name (str): Name of the panel to use for saving the figure.
         n_rows (int): Number of subplot rows defined by the user.
         n_cols (int): Number of subplot columns defined by the user.
@@ -38,8 +37,6 @@ class PanelBuilder:
 
         Args:
             config (Dict[str, Any]): Layout and styling configuration.
-            debug (bool, optional): Whether to draw debug grid lines. 
-                Defaults to False.
         """
         self.config = PanelBuilderConfig.from_dict(config)
 
@@ -232,10 +229,7 @@ class PanelBuilder:
         return axs
     
     def draw_debug_lines(self) -> None:
-        """Draws debug lines on the axes to help with layout debugging.
-        
-        If debug is False, this method does nothing.
-        """
+        """Draw debug grid lines if enabled in the configuration."""
         if not self.config.debug_panel.show:
             return
         
