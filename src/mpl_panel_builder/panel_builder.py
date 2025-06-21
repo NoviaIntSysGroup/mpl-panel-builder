@@ -7,6 +7,7 @@ import numpy as np
 from matplotlib.axes import Axes as MatplotlibAxes
 from matplotlib.figure import Figure as MatplotlibFigure
 
+from mpl_panel_builder import mpl_helpers
 from mpl_panel_builder.panel_builder_config import PanelBuilderConfig
 
 
@@ -20,7 +21,6 @@ class PanelBuilder:
     Attributes:
         config (PanelConfig): Configuration object containing panel dimensions,
             margins, font sizes, and axis separation settings.
-        debug (bool): Whether to draw debug grid lines for layout assistance.
         panel_name (str): Name of the panel to use for saving the figure.
         n_rows (int): Number of subplot rows defined by the user.
         n_cols (int): Number of subplot columns defined by the user.
@@ -38,8 +38,6 @@ class PanelBuilder:
 
         Args:
             config (Dict[str, Any]): Layout and styling configuration.
-            debug (bool, optional): Whether to draw debug grid lines. 
-                Defaults to False.
         """
         self.config = PanelBuilderConfig.from_dict(config)
 
@@ -231,11 +229,84 @@ class PanelBuilder:
 
         return axs
     
-    def draw_debug_lines(self) -> None:
-        """Draws debug lines on the axes to help with layout debugging.
-        
-        If debug is False, this method does nothing.
+    def draw_scale_bar(
+        self, 
+        ax: MatplotlibAxes, 
+        length: float, 
+        label: str, 
+        direction: Literal["x", "y"]
+    ) -> None:
+        """Draws a scale bar for the given axes.
+
+        The scale bar is drawn on a new axes covering the entire figure. This 
+        makes it possible to draw the scale bar on inside or outside of the axes.
+
+        Args:
+            ax: The axes to draw the scale bar for.
+            length: The length of the scale bar in axes units.
+            label: The label to display next to the scale bar.
+            direction: The direction of the scale bar ("x" or "y").
         """
+
+        sep_cm = self.config.scale_bar_pos_cm.sep_cm
+        offset_cm = self.config.scale_bar_pos_cm.offset_cm
+        delta_text_cm = self.config.scale_bar_pos_cm.delta_text_cm
+        font_size_pt = self.config.font_sizes_pt.axes
+
+        ax_bbox = ax.get_position()
+        overlay_ax = mpl_helpers.create_full_figure_axes(self.fig)
+
+        if direction == "x":
+            sep_rel = mpl_helpers.cm_to_rel(self.fig, sep_cm, "height")
+            offset_rel = mpl_helpers.cm_to_rel(self.fig, offset_cm, "width")
+            delta_text_rel = mpl_helpers.cm_to_rel(self.fig, delta_text_cm, "height")
+
+            ax_lim = ax.get_xlim()
+            length_rel = ax_bbox.width / (ax_lim[1] - ax_lim[0]) * length
+
+            x_rel = ax_bbox.x0 + offset_rel
+            y_rel = ax_bbox.y0 - sep_rel
+
+            overlay_ax.plot([x_rel, x_rel + length_rel], [y_rel, y_rel], "k-")
+            overlay_ax.text(
+                x_rel + length_rel / 2, 
+                y_rel - delta_text_rel, 
+                label, 
+                ha="center", 
+                va="top", 
+                fontsize=font_size_pt
+            )
+        
+        elif direction == "y":
+            sep_rel = mpl_helpers.cm_to_rel(self.fig, sep_cm, "width")
+            offset_rel = mpl_helpers.cm_to_rel(self.fig, offset_cm, "height")
+            delta_text_rel = mpl_helpers.cm_to_rel(self.fig, delta_text_cm, "width")
+            # The ascender length is roughly 0.25 of the font size for the default font
+            # We therefore move the text this amount to make it appear to have the 
+            # same distance to the scale bar as the text for the x-direction.
+            font_offset_cm = mpl_helpers.pt_to_cm(font_size_pt) * 0.25
+            delta_text_rel -= mpl_helpers.cm_to_rel(self.fig, font_offset_cm, "width")
+
+            # Get the length of the scale bar in relative coordinates   
+            ax_lim = ax.get_ylim()
+            length_rel = ax_bbox.height / (ax_lim[1] - ax_lim[0]) * length
+
+            x_rel = ax_bbox.x0 - sep_rel
+            y_rel = ax_bbox.y0 + offset_rel
+
+            overlay_ax.plot([x_rel, x_rel], [y_rel, y_rel + length_rel], "k-")
+            overlay_ax.text(
+                x_rel - delta_text_rel, 
+                y_rel + length_rel / 2, 
+                label, 
+                ha="right", 
+                va="center", 
+                rotation=90, 
+                fontsize=font_size_pt
+            )
+    
+    def draw_debug_lines(self) -> None:
+        """Draw debug grid lines if enabled in the configuration."""
         if not self.config.debug_panel.show:
             return
         
@@ -245,7 +316,8 @@ class PanelBuilder:
             (0.0, 0.0, 1.0, 1.0), 
             frameon=False, 
             aspect="auto", 
-            facecolor="none"
+            facecolor="none",
+            zorder=-10
         )
         
         # Set the axes limits to the figure dimensions from the config
@@ -270,24 +342,6 @@ class PanelBuilder:
         # Hide tick labels
         ax.set_xticklabels([])
         ax.set_yticklabels([])
-
-    def cm_to_rel(self, cm: float, dim: Literal["width", "height"]) -> float:
-        """Converts a length in cm to a relative coordinate.
-        
-        Args:
-            cm (float): The length in cm.
-            dim (Literal["width", "height"]): The dimension to 
-                convert to relative coordinates.
-
-        Returns:
-            float: The relative coordinate.
-        """
-        if dim == "width":
-            return cm / self.config.panel_dimensions_cm.width
-        elif dim == "height":
-            return cm / self.config.panel_dimensions_cm.height
-        else:
-            raise ValueError(f"Invalid dimension: {dim}")
         
     def save_fig(self, filename_suffix: str | None = None) -> None:
         """Saves the figure to the output directory.

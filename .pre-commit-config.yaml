@@ -11,6 +11,7 @@ repos:
       - id: mypy
         additional_dependencies:
           - pytest
+          - types-PyYAML
         stages: [pre-commit]
 
   - repo: local

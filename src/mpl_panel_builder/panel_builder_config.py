@@ -207,6 +207,21 @@ class AxSeparation(FrozenConfigBase):
         """
         if self.x < 0 or self.y < 0:
             raise ValueError("Axis separation must be non-negative.")
+        
+
+@dataclass(frozen=True)
+class ScaleBar(FrozenConfigBase):
+    """Stores scale bar configuration.
+    
+    Attributes:
+        sep_cm: Separation between the scale bar and the axes in centimeters.
+        offset_cm: Distance from the axes edge to the scale bar in centimeters.
+        delta_text_cm: Distance from the scale bar to the label in centimeters.
+    """
+    sep_cm: float = 0.2
+    offset_cm: float = 0.2
+    delta_text_cm: float = 0.1
+
 
 @dataclass(frozen=True)
 class DebugPanel(FrozenConfigBase):
@@ -264,12 +279,15 @@ class PanelBuilderConfig(FrozenConfigBase):
         panel_margins_cm: Panel margin sizes in centimeters.
         font_sizes_pt: Font sizes for different figure elements in points.
         ax_separation_cm: Separation between adjacent axes in centimeters.
+        scale_bar_pos_cm: Position of the scale bar in centimeters.
+        debug_panel: Debug panel configuration.
         panel_output: Output configuration for panels.
     """
     panel_dimensions_cm: Dimensions
     panel_margins_cm: Margins
     font_sizes_pt: FontSizes
     ax_separation_cm: AxSeparation = AxSeparation()
+    scale_bar_pos_cm: ScaleBar = ScaleBar()
     debug_panel: DebugPanel = DebugPanel()
     panel_output: PanelOutput = PanelOutput()
 

@@ -1,9 +1,6 @@
-"""Demo script illustrating usage of :class:`PanelBuilder` subclasses.
+""" This example depicts config keys with three custom panels.
 
-This script demonstrates the creation of panels to visualize the required 
-configuration keys: dimensions, margins, and font sizes.
-
-The script creates three panels:
+The script defines the following subclasses of :class:`PanelBuilder`:
 - DimPanelDemo: 1 by 1 panel showing panel dimensions
 - MarginPanelDemo: 1 by 1 panel illustrating panel margins
 - FontSizePanelDemo: 1 by 1 panel demonstrating configured font sizes
@@ -17,19 +14,21 @@ from typing import Any
 
 import numpy as np
 from matplotlib.axes import Axes
-from matplotlib.figure import Figure
 
 # Add the project root to sys.path to allow importing helpers module
 sys.path.append(str(Path(__file__).parent.parent.parent.absolute()))
-from examples.helpers import get_project_root
+from examples.helpers import get_logger, get_project_root
+from mpl_panel_builder.mpl_helpers import cm_to_rel, create_full_figure_axes
 from mpl_panel_builder.panel_builder import PanelBuilder
+
+logger = get_logger(__name__)
 
 # Define panel configuration
 margin = 1
 project_root = get_project_root()
 current_dir = Path(__file__).parent
 example_name = current_dir.name
-config = {
+config: dict[str, Any] = {
     # Required keys (no default values)
     "panel_dimensions_cm": {"width": 6.0, "height": 5.0},
     "panel_margins_cm": {
@@ -50,27 +49,10 @@ config = {
 }
 
 # Create output directory if it doesn't exist
-config["panel_output"]["directory"].mkdir(parents=True, exist_ok=True)  # type: ignore
+config["panel_output"]["directory"].mkdir(parents=True, exist_ok=True)
 
 # Example specific helper functions
-
-def add_full_panel_axes(fig: Figure) -> Axes:
-    """Add an invisible axes covering the entire figure.
-
-    Args:
-        fig: Figure to add the axes to.
-
-    Returns:
-        The created axes.
-    """
-
-    ax = fig.add_axes((0.0, 0.0, 1.0, 1.0), facecolor="none", zorder=-1)
-    ax.axis("off")
-    ax.set(xlim=[0, 1], ylim=[0, 1])
-    return ax
-
-
-def plot_sinusoid(ax: Axes, style: str = "b-") -> None:
+def _plot_sinusoid(ax: Axes, style: str = "b-") -> None:
     """Plot a simple sinusoid.
 
     Args:
@@ -95,15 +77,15 @@ class DimPanelDemo(PanelBuilder):
     def build_panel(self) -> None:
         """Create custom content for the panel."""
 
-        plot_sinusoid(self.axs[0][0], self.config.plot_styles.data)
+        _plot_sinusoid(self.axs[0][0], self.config.plot_styles.data)
 
         delta = 0.005  # Small delta to avoid overlap with panel border
-        ax_panel = add_full_panel_axes(self.fig)
+        ax_panel = create_full_figure_axes(self.fig)
         ax_panel.plot([0, 1], [delta, delta], self.config.plot_styles.config)
         ax_panel.plot([delta, delta], [0, 1], self.config.plot_styles.config)
 
-        padding_rel_x = self.cm_to_rel(margin / 2, "width")
-        padding_rel_y = self.cm_to_rel(margin / 2, "height")
+        padding_rel_x = cm_to_rel(self.fig, margin / 2, "width")
+        padding_rel_y = cm_to_rel(self.fig, margin / 2, "height")
         shared_text_args: dict[str, Any] = {
             "ha": "center",
             "va": "center",
@@ -123,7 +105,7 @@ class MarginPanelDemo(PanelBuilder):
     def build_panel(self) -> None:
         """Create custom content for the panel."""
 
-        plot_sinusoid(self.axs[0][0])
+        _plot_sinusoid(self.axs[0][0])
 
         margins_cm = self.config.panel_margins_cm
         dims_cm = self.config.panel_dimensions_cm
@@ -132,7 +114,7 @@ class MarginPanelDemo(PanelBuilder):
         top_margin = margins_cm.top / dims_cm.height
         bottom_margin = margins_cm.bottom / dims_cm.height
 
-        ax_panel = add_full_panel_axes(self.fig)
+        ax_panel = create_full_figure_axes(self.fig)
         ax_panel.plot([0, 1], [bottom_margin, bottom_margin], "k:")
         ax_panel.plot([left_margin, left_margin], [0, 1], "k:")
         ax_panel.plot([1 - right_margin, 1 - right_margin], [0, 1], "k:")
@@ -165,7 +147,7 @@ class FontSizePanelDemo(PanelBuilder):
     def build_panel(self) -> None:
         """Create custom content for the panel."""
 
-        plot_sinusoid(self.axs[0][0])
+        _plot_sinusoid(self.axs[0][0])
         self.axs[0][0].set(
             xlabel="axes",
             ylabel="axes",
@@ -184,5 +166,10 @@ if __name__ == "__main__":
     ]
 
     for builder_class in builders:
+        logger.info("Creating panel with class: %s", builder_class.__name__)
         builder = builder_class(config)
         builder()
+        logger.info(
+            "Panel created and saved to %s", 
+            config["panel_output"]["directory"]
+        )

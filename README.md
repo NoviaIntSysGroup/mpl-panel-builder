@@ -69,10 +69,10 @@ config = {
     },
     # Margins around the panel content (axes)
     "panel_margins_cm": {
-        "top": 1.0,
-        "bottom": 1.0,
-        "left": 1.0,
-        "right": 1.0,
+        "top": 0.5,
+        "bottom": 1.5,
+        "left": 1.5,
+        "right": 0.5,
     },
     # Font sizes in points
     "font_sizes_pt": {
@@ -81,17 +81,17 @@ config = {
     }
 }
 
-# 2. Create a panel subclass
+# 2. Subclass PanelBuilder
 class MyPanel(PanelBuilder):
     # Required class attributes
     _panel_name = "my_panel"  # Unique identifier for the panel
-    _n_rows = 1              # Number of rows in the panel grid
-    _n_cols = 1              # Number of columns in the panel grid
+    _n_rows = 1               # Number of rows in the panel grid
+    _n_cols = 1               # Number of columns in the panel grid
 
     def build_panel(self) -> None:
-        """Populate the panel with plot content.
+        """Populate the panel with your content.
         
-        This method is called automatically when creating the panel.
+        This method is called automatically when calling the panel class instance.
         Override this method to define your custom plotting logic.
         """
         # Access the single axis
@@ -104,7 +104,7 @@ class MyPanel(PanelBuilder):
 
 # 3. Create and build the panel
 panel = MyPanel(config)
-fig = panel()  # This creates and returns the figure
+fig = panel()  # This creates and returns the figure panel
 ```
 
 ## Examples
@@ -120,7 +120,7 @@ python examples/config_visualization/create_panels.py
 python examples/config_visualization/create_figure.py
 ```
 
-<img src="outputs/config_visualization/figure.png" style="max-width: 500px; width: 100%; height: auto;" />  
+<img src="outputs/ex_2_config_visualization/figure.png" style="max-width: 500px; width: 100%; height: auto;" />  
 
 ## Repository layout
 

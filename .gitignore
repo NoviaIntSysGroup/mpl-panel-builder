@@ -14,6 +14,9 @@
 # Pickle files
 *.pkl
 
+# Build files
+dist/
+
 # Generated figures
 *.pdf
 *.png
