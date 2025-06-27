@@ -5,6 +5,8 @@ from typing import Any, Literal
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes as MatplotlibAxes
+from matplotlib.cm import ScalarMappable
+from matplotlib.colorbar import Colorbar
 from matplotlib.figure import Figure as MatplotlibFigure
 
 from mpl_panel_builder import mpl_helpers
@@ -111,8 +113,8 @@ class PanelBuilder:
             Dict[str, Any]: A style dictionary for matplotlib.rc_context, or empty 
                 dict if font sizes are not defined in config.
         """
-        axes_font_size = self.config.font_sizes_pt.axes
-        text_font_size = self.config.font_sizes_pt.text
+        axes_font_size = self.config.font_sizes.axes_pt
+        text_font_size = self.config.font_sizes.text_pt
 
         return {
 
@@ -135,8 +137,8 @@ class PanelBuilder:
             "legend.fontsize": text_font_size,
 
             # Line styles
-            "lines.linewidth": 1,
-            "lines.markersize": 4,
+            "lines.linewidth": self.config.line_style.line_width_pt,
+            "lines.markersize": self.config.line_style.marker_size_pt,
 
             # Legend appearance
             "legend.frameon": True,
@@ -155,9 +157,9 @@ class PanelBuilder:
             MatplotlibFigure: The created figure object.
         """
         # Get dimensions from config and convert to inches
-        dims = self.config.panel_dimensions_cm
-        fig_width_in = dims.width / 2.54
-        fig_height_in = dims.height / 2.54
+        dims = self.config.panel_dimensions
+        fig_width_in = dims.width_cm / 2.54
+        fig_height_in = dims.height_cm / 2.54
         
         # Create the figure
         fig = plt.figure(figsize=(fig_width_in, fig_height_in))
@@ -172,19 +174,21 @@ class PanelBuilder:
         num_rows, num_cols = self.n_rows, self.n_cols
         
         # Get figure dimensions in cm
-        fig_width_cm = self.config.panel_dimensions_cm.width
-        fig_height_cm = self.config.panel_dimensions_cm.height
+        fig_width_cm = self.config.panel_dimensions.width_cm
+        fig_height_cm = self.config.panel_dimensions.height_cm
         
         # Get margins from config and calculate the plot region in relative coordinates
-        margins = self.config.panel_margins_cm
-        plot_left = margins.left / fig_width_cm
-        plot_bottom = margins.bottom / fig_height_cm
-        plot_width = (fig_width_cm - margins.left - margins.right) / fig_width_cm
-        plot_height = (fig_height_cm - margins.top - margins.bottom) / fig_height_cm
+        margins = self.config.panel_margins
+        plot_left = margins.left_cm / fig_width_cm
+        plot_bottom = margins.bottom_cm / fig_height_cm
+        plot_width = (fig_width_cm - margins.left_cm - margins.right_cm) / fig_width_cm
+        plot_height = (
+            (fig_height_cm - margins.top_cm - margins.bottom_cm) / fig_height_cm
+        )
         
         # Convert separation to relative coordinates
-        sep_x_rel = self.config.ax_separation_cm.x / fig_width_cm
-        sep_y_rel = self.config.ax_separation_cm.y / fig_height_cm
+        sep_x_rel = self.config.axes_separation.x_cm / fig_width_cm
+        sep_y_rel = self.config.axes_separation.y_cm / fig_height_cm
 
         # Calculate relative widths and heights
         rel_col_widths = (1.0 / num_cols,) * num_cols
@@ -248,10 +252,10 @@ class PanelBuilder:
             direction: The direction of the scale bar ("x" or "y").
         """
 
-        sep_cm = self.config.scale_bar_pos_cm.sep_cm
-        offset_cm = self.config.scale_bar_pos_cm.offset_cm
-        delta_text_cm = self.config.scale_bar_pos_cm.delta_text_cm
-        font_size_pt = self.config.font_sizes_pt.axes
+        sep_cm = self.config.scalebar_config.separation_cm
+        offset_cm = self.config.scalebar_config.offset_cm
+        delta_text_cm = self.config.scalebar_config.text_offset_cm
+        font_size_pt = self.config.font_sizes.axes_pt
 
         ax_bbox = ax.get_position()
         overlay_ax = mpl_helpers.create_full_figure_axes(self.fig)
@@ -305,6 +309,68 @@ class PanelBuilder:
                 fontsize=font_size_pt
             )
     
+    def add_colorbar(
+        self, 
+        mappable: ScalarMappable,
+        ax: MatplotlibAxes, 
+        position: Literal["left", "right", "bottom", "top"],
+        shrink_axes: bool = True
+    ) -> Colorbar:
+        """Add a colorbar adjacent to the given axes.
+
+        This method optionally shrinks the provided axes to make room for a 
+        colorbar and creates a properly configured colorbar in the specified position.
+
+        Args:
+            mappable: The mappable object (e.g., result of imshow, contourf, etc.) 
+                to create the colorbar for.
+            ax: The axes to add the colorbar to.
+            position: The position of the colorbar relative to the axes.
+            shrink_axes: Whether to shrink the original axes to make room for
+                the colorbar. Defaults to True.
+
+        Returns:
+            The created colorbar object.
+        """
+        colorbar_config = self.config.colorbar_config
+        
+        if shrink_axes:
+            total_space_cm = colorbar_config.width_cm + colorbar_config.separation_cm
+            mpl_helpers.adjust_axes_size(ax, total_space_cm, position)
+        
+        position_rect = mpl_helpers.calculate_colorbar_position(
+            ax, 
+            position, 
+            colorbar_config.width_cm, 
+            colorbar_config.separation_cm
+        )
+        
+        cbar_ax: MatplotlibAxes = self.fig.add_axes(position_rect)
+        
+        # Determine orientation based on position
+        orientation = "vertical" if position in ["left", "right"] else "horizontal"
+        
+        # Create the colorbar
+        cbar = self.fig.colorbar(mappable, cax=cbar_ax, orientation=orientation)
+        
+        # Configure colorbar based on position
+        if position == "left":
+            # Move ticks and labels to the left
+            cbar.ax.yaxis.set_ticks_position('left')
+            cbar.ax.yaxis.set_label_position('left')
+        elif position == "right":
+            # Ticks and labels are already on the right by default
+            pass
+        elif position == "bottom":
+            # Ticks and labels are already on the bottom by default
+            pass
+        elif position == "top":
+            # Move ticks and labels to the top
+            cbar.ax.xaxis.set_ticks_position('top')
+            cbar.ax.xaxis.set_label_position('top')
+        
+        return cbar
+    
     def draw_debug_lines(self) -> None:
         """Draw debug grid lines if enabled in the configuration."""
         if not self.config.debug_panel.show:
@@ -321,13 +387,13 @@ class PanelBuilder:
         )
         
         # Set the axes limits to the figure dimensions from the config
-        fig_width_cm = self.config.panel_dimensions_cm.width
-        fig_height_cm = self.config.panel_dimensions_cm.height
+        fig_width_cm = self.config.panel_dimensions.width_cm
+        fig_height_cm = self.config.panel_dimensions.height_cm
         ax.set_xlim(0, fig_width_cm)
         ax.set_ylim(0, fig_height_cm)
         
-        # Draw gridlines at every grid_res_cm cm
-        delta = self.config.debug_panel.grid_res_cm
+        # Draw gridlines at every grid_resolution_cm cm
+        delta = self.config.debug_panel.grid_resolution_cm
         ax.set_xticks(np.arange(0, fig_width_cm, delta))
         ax.set_yticks(np.arange(0, fig_height_cm, delta))
         ax.grid(True, linestyle=":", alpha=1)

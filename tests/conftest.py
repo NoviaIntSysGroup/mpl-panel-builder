@@ -18,12 +18,17 @@ def sample_config_dict(tmp_path: Path) -> ConfigDict:
     """
     return {
         # Required (no default values)
-        "panel_dimensions_cm": {"width": 10.0, "height": 8.0},
-        "panel_margins_cm": {"top": 1.0, "bottom": 1.5, "left": 2.0, "right": 1.0},
-        "font_sizes_pt": {"axes": 12.0, "text": 10.0},
+        "panel_dimensions": {"width_cm": 10.0, "height_cm": 8.0},
+        "panel_margins": {
+            "top_cm": 1.0, 
+            "bottom_cm": 1.5, 
+            "left_cm": 2.0, 
+            "right_cm": 1.0
+        },
+        "font_sizes": {"axes_pt": 12.0, "text_pt": 10.0},
         # Optional (has default values)
-        "ax_separation_cm": {"x": 0.5, "y": 1.0},
-        "debug_panel": {"show": True, "grid_res_cm": 0.5},
+        "axes_separation": {"x_cm": 0.5, "y_cm": 1.0},
+        "debug_panel": {"show": True, "grid_resolution_cm": 0.5},
         "panel_output": {
             "directory": str(tmp_path),
             "format": "pdf",

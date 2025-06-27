@@ -1,12 +1,15 @@
 """Helper functions for matplotlib."""
 
-from typing import Literal, cast
+from typing import TYPE_CHECKING, Literal, cast
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
-from matplotlib.figure import Figure
+from matplotlib.figure import Figure, SubFigure
 from numpy.typing import NDArray
+
+if TYPE_CHECKING:
+    pass
 
 
 def cm_to_inches(cm: float) -> float:
@@ -47,7 +50,9 @@ def pt_to_cm(pt: float) -> float:
     return inches_to_cm(pt / 72)
 
 
-def cm_to_rel(fig: Figure, cm: float, dim: Literal["width", "height"]) -> float:
+def cm_to_rel(
+    fig: Figure | SubFigure, cm: float, dim: Literal["width", "height"]
+) -> float:
     """Convert centimeters to relative coordinates.
     
     This is a simple conversion factor.
@@ -60,14 +65,22 @@ def cm_to_rel(fig: Figure, cm: float, dim: Literal["width", "height"]) -> float:
     Returns:
         The value in relative coordinates.
     """
+    if hasattr(fig, 'get_size_inches'):
+        size_inches = fig.get_size_inches()
+    else:
+        # SubFigure case - get size from parent figure
+        size_inches = fig.figure.get_size_inches()
+    
     if dim == "width":
-        return cm_to_inches(cm) / float(fig.get_size_inches()[0])
+        return cm_to_inches(cm) / float(size_inches[0])
     elif dim == "height":
-        return cm_to_inches(cm) / float(fig.get_size_inches()[1])
+        return cm_to_inches(cm) / float(size_inches[1])
     else:
         raise ValueError(f"Invalid dimension: {dim}")
     
-def rel_to_cm(fig: Figure, rel: float, dim: Literal["width", "height"]) -> float:
+def rel_to_cm(
+    fig: Figure | SubFigure, rel: float, dim: Literal["width", "height"]
+) -> float:
     """Convert relative coordinates to centimeters.
     
     Args:
@@ -78,10 +91,16 @@ def rel_to_cm(fig: Figure, rel: float, dim: Literal["width", "height"]) -> float
     Returns:
         The value in centimeters.
     """
+    if hasattr(fig, 'get_size_inches'):
+        size_inches = fig.get_size_inches()
+    else:
+        # SubFigure case - get size from parent figure
+        size_inches = fig.figure.get_size_inches()
+    
     if dim == "width":
-        return inches_to_cm(rel * float(fig.get_size_inches()[0]))
+        return inches_to_cm(rel * float(size_inches[0]))
     elif dim == "height":
-        return inches_to_cm(rel * float(fig.get_size_inches()[1]))
+        return inches_to_cm(rel * float(size_inches[1]))
     else:
         raise ValueError(f"Invalid dimension: {dim}")
 
@@ -144,3 +163,128 @@ def move_yaxis_right(ax: Axes) -> None:
     ax.yaxis.set_label_position("right")
     ax.spines["left"].set_visible(False)
     ax.spines["right"].set_visible(True)
+
+def move_xaxis_top(ax: Axes) -> None:
+    """Move the x-axis of the given Axes object to the top side.
+
+    This function updates tick marks, label position, and spine visibility to move
+    the x-axis from the bottom to the top of the plot.
+
+    Args:
+        ax (Axes): The matplotlib Axes object to modify.
+
+    Returns:
+        None
+    """
+    ax.xaxis.tick_top()
+    ax.xaxis.set_label_position("top")
+    ax.spines["bottom"].set_visible(False)
+    ax.spines["top"].set_visible(True)
+
+def adjust_axes_size(
+    ax: Axes, 
+    length_cm: float, 
+    direction: Literal["left", "right", "bottom", "top"]
+) -> None:
+    """Adjust the size of an axes by shrinking it in the specified direction.
+
+    This function modifies the axes position to make room for additional 
+    elements like colorbars by reducing its size in the specified direction.
+
+    Args:
+        ax (Axes): The matplotlib Axes object to modify.
+        length_cm (float): The amount to shrink the axes by in centimeters.
+        direction (Literal["left", "right", "bottom", "top"]): The direction
+            to shrink the axes towards.
+
+    Returns:
+        None
+    """
+    fig = ax.get_figure()
+    if fig is None:
+        raise ValueError("Axes must be attached to a figure")
+    
+    # Get current position
+    pos = ax.get_position()
+    x0, y0, width, height = pos.x0, pos.y0, pos.width, pos.height
+    
+    # Convert length to relative coordinates
+    if direction in ["left", "right"]:
+        length_rel = cm_to_rel(fig, length_cm, "width")
+    else:  # "bottom", "top"
+        length_rel = cm_to_rel(fig, length_cm, "height")
+    
+    # Adjust position based on direction
+    if direction == "left":
+        new_x0 = x0 + length_rel
+        new_width = width - length_rel
+        ax.set_position((new_x0, y0, new_width, height))
+    elif direction == "right":
+        new_width = width - length_rel
+        ax.set_position((x0, y0, new_width, height))
+    elif direction == "bottom":
+        new_y0 = y0 + length_rel
+        new_height = height - length_rel
+        ax.set_position((x0, new_y0, width, new_height))
+    elif direction == "top":
+        new_height = height - length_rel
+        ax.set_position((x0, y0, width, new_height))
+
+def calculate_colorbar_position(
+    ax: Axes,
+    position: Literal["left", "right", "bottom", "top"],
+    width_cm: float,
+    separation_cm: float
+) -> tuple[float, float, float, float]:
+    """Calculate colorbar position rectangle (x, y, width, height).
+    
+    Args:
+        ax: The axes to place the colorbar next to.
+        position: The position of the colorbar relative to the axes.
+        width_cm: The width of the colorbar in centimeters.
+        separation_cm: The separation between axes and colorbar in centimeters.
+        
+    Returns:
+        Tuple of (x, y, width, height) in relative coordinates.
+    """
+    fig = ax.get_figure()
+    if fig is None:
+        raise ValueError("Axes must be attached to a figure")
+    
+    ax_pos = ax.get_position()
+    is_vertical = position in ["left", "right"]
+    dimension_type: Literal["width", "height"] = "width" if is_vertical else "height"
+    
+    width_rel = cm_to_rel(fig, width_cm, dimension_type)
+    sep_rel = cm_to_rel(fig, separation_cm, dimension_type)
+    
+    if position == "left":
+        return (
+            ax_pos.x0 - sep_rel - width_rel,
+            ax_pos.y0,
+            width_rel,
+            ax_pos.height
+        )
+    elif position == "right":
+        return (
+            ax_pos.x0 + ax_pos.width + sep_rel,
+            ax_pos.y0,
+            width_rel,
+            ax_pos.height
+        )
+    elif position == "bottom":
+        return (
+            ax_pos.x0,
+            ax_pos.y0 - sep_rel - width_rel,
+            ax_pos.width,
+            width_rel
+        )
+    elif position == "top":
+        return (
+            ax_pos.x0,
+            ax_pos.y0 + ax_pos.height + sep_rel,
+            ax_pos.width,
+            width_rel
+        )
+    else:
+        raise ValueError(f"Invalid position: {position}")

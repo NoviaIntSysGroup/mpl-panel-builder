@@ -30,14 +30,14 @@ current_dir = Path(__file__).parent
 example_name = current_dir.name
 config: dict[str, Any] = {
     # Required keys (no default values)
-    "panel_dimensions_cm": {"width": 6.0, "height": 5.0},
-    "panel_margins_cm": {
-        "left": margin,
-        "right": margin,
-        "top": margin,
-        "bottom": margin,
+    "panel_dimensions": {"width_cm": 6.0, "height_cm": 5.0},
+    "panel_margins": {
+        "left_cm": margin,
+        "right_cm": margin,
+        "top_cm": margin,
+        "bottom_cm": margin,
     },
-    "font_sizes_pt": {"axes": 8, "text": 6},
+    "font_sizes": {"axes_pt": 8, "text_pt": 6},
     # Optional keys (with default values)
     "panel_output": {
         "directory": project_root / "outputs" / example_name / "panels",
@@ -89,7 +89,7 @@ class DimPanelDemo(PanelBuilder):
         shared_text_args: dict[str, Any] = {
             "ha": "center",
             "va": "center",
-            "fontsize": self.config.font_sizes_pt.axes,
+            "fontsize": self.config.font_sizes.axes_pt,
         }
         self.fig.text(0.5, padding_rel_y, "width", **shared_text_args)
         self.fig.text(padding_rel_x, 0.5, "height", rotation=90, **shared_text_args)
@@ -107,12 +107,12 @@ class MarginPanelDemo(PanelBuilder):
 
         _plot_sinusoid(self.axs[0][0])
 
-        margins_cm = self.config.panel_margins_cm
-        dims_cm = self.config.panel_dimensions_cm
-        left_margin = margins_cm.left / dims_cm.width
-        right_margin = margins_cm.right / dims_cm.width
-        top_margin = margins_cm.top / dims_cm.height
-        bottom_margin = margins_cm.bottom / dims_cm.height
+        margins_cm = self.config.panel_margins
+        dims_cm = self.config.panel_dimensions
+        left_margin = margins_cm.left_cm / dims_cm.width_cm
+        right_margin = margins_cm.right_cm / dims_cm.width_cm
+        top_margin = margins_cm.top_cm / dims_cm.height_cm
+        bottom_margin = margins_cm.bottom_cm / dims_cm.height_cm
 
         ax_panel = create_full_figure_axes(self.fig)
         ax_panel.plot([0, 1], [bottom_margin, bottom_margin], "k:")
@@ -123,7 +123,7 @@ class MarginPanelDemo(PanelBuilder):
         shared_text_args: dict[str, Any] = {
             "ha": "center",
             "va": "center",
-            "fontsize": self.config.font_sizes_pt.axes,
+            "fontsize": self.config.font_sizes.axes_pt,
         }
         self.fig.text(0.5, bottom_margin / 2, "bottom", **shared_text_args)
         self.fig.text(0.5, 1 - top_margin / 2, "top", **shared_text_args)

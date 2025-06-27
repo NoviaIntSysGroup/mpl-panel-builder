@@ -111,7 +111,11 @@ class FrozenConfigBase:
 
             # If the key is not a declared field, add it to the extra dictionary    
             else:
-                extra[key] = CustomConfigDotDict(value)
+                # Only wrap dictionaries with CustomConfigDotDict
+                if isinstance(value, dict):
+                    extra[key] = CustomConfigDotDict(value)
+                else:
+                    extra[key] = value
 
         # Create the frozen dataclass instance
         instance = cls(**declared)  # This triggers __post_init__ if defined
@@ -126,11 +130,11 @@ class FontSizes(FrozenConfigBase):
     """Stores font sizes for different figure elements.
     
     Attributes:
-        axes: Font size for axis labels and tick labels in points.
-        text: Font size for general text elements in points.
+        axes_pt: Font size for axis labels and tick labels in points.
+        text_pt: Font size for general text elements in points.
     """
-    axes: float
-    text: float
+    axes_pt: float
+    text_pt: float
 
     def __post_init__(self) -> None:
         """Post-initialization checks for font sizes.
@@ -138,7 +142,7 @@ class FontSizes(FrozenConfigBase):
         Raises:
             ValueError: If any font size is negative.
         """
-        if self.axes < 0 or self.text < 0:
+        if self.axes_pt < 0 or self.text_pt < 0:
             raise ValueError("Font sizes must be positive.")
 
 
@@ -147,11 +151,11 @@ class Dimensions(FrozenConfigBase):
     """Stores width and height dimensions.
     
     Attributes:
-        width: Width dimension in centimeters.
-        height: Height dimension in centimeters.
+        width_cm: Width dimension in centimeters.
+        height_cm: Height dimension in centimeters.
     """
-    width: float
-    height: float
+    width_cm: float
+    height_cm: float
 
     def __post_init__(self) -> None:
         """Post-initialization checks for dimensions.
@@ -159,7 +163,7 @@ class Dimensions(FrozenConfigBase):
         Raises:
             ValueError: If width or height is negative.
         """
-        if self.width < 0 or self.height < 0:
+        if self.width_cm < 0 or self.height_cm < 0:
             raise ValueError("Dimensions must be positive.")
 
 
@@ -168,15 +172,15 @@ class Margins(FrozenConfigBase):
     """Stores margin sizes for all sides of a panel.
     
     Attributes:
-        top: Top margin in centimeters.
-        bottom: Bottom margin in centimeters.
-        left: Left margin in centimeters.
-        right: Right margin in centimeters.
+        top_cm: Top margin in centimeters.
+        bottom_cm: Bottom margin in centimeters.
+        left_cm: Left margin in centimeters.
+        right_cm: Right margin in centimeters.
     """
-    top: float
-    bottom: float
-    left: float
-    right: float
+    top_cm: float
+    bottom_cm: float
+    left_cm: float
+    right_cm: float
 
     def __post_init__(self) -> None:
         """Post-initialization checks for margins.
@@ -184,20 +188,23 @@ class Margins(FrozenConfigBase):
         Raises:
             ValueError: If any margin value is negative.
         """
-        if self.top < 0 or self.bottom < 0 or self.left < 0 or self.right < 0:
+        if (
+            self.top_cm < 0 or self.bottom_cm < 0 or 
+            self.left_cm < 0 or self.right_cm < 0
+        ):
             raise ValueError("Margins must be non-negative.")
 
 
 @dataclass(frozen=True)
-class AxSeparation(FrozenConfigBase):
+class AxesSeparation(FrozenConfigBase):
     """Stores separation distances between adjacent axes.
     
     Attributes:
-        x: Horizontal separation between adjacent axes in centimeters.
-        y: Vertical separation between adjacent axes in centimeters.
+        x_cm: Horizontal separation between adjacent axes in centimeters.
+        y_cm: Vertical separation between adjacent axes in centimeters.
     """
-    x: float = 0.0
-    y: float = 0.0
+    x_cm: float = 0.0
+    y_cm: float = 0.0
 
     def __post_init__(self) -> None:
         """Post-initialization checks for axis separation.
@@ -205,22 +212,67 @@ class AxSeparation(FrozenConfigBase):
         Raises:
             ValueError: If x or y separation is negative.
         """
-        if self.x < 0 or self.y < 0:
+        if self.x_cm < 0 or self.y_cm < 0:
             raise ValueError("Axis separation must be non-negative.")
         
 
 @dataclass(frozen=True)
-class ScaleBar(FrozenConfigBase):
+class LineStyle(FrozenConfigBase):
+    """Stores line and marker styling configuration.
+    
+    Attributes:
+        line_width_pt: Width of lines in points.
+        marker_size_pt: Size of markers in points.
+    """
+    line_width_pt: float = 1.0
+    marker_size_pt: float = 4.0
+
+    def __post_init__(self) -> None:
+        """Post-initialization checks for line style.
+        
+        Raises:
+            ValueError: If line_width_pt or marker_size_pt is negative.
+        """
+        if self.line_width_pt <= 0 or self.marker_size_pt <= 0:
+            raise ValueError("Line width and marker size must be positive.")
+
+
+@dataclass(frozen=True)
+class ScaleBarConfig(FrozenConfigBase):
     """Stores scale bar configuration.
     
     Attributes:
-        sep_cm: Separation between the scale bar and the axes in centimeters.
+        separation_cm: Separation between the scale bar and the axes in centimeters.
         offset_cm: Distance from the axes edge to the scale bar in centimeters.
-        delta_text_cm: Distance from the scale bar to the label in centimeters.
+        text_offset_cm: Distance from the scale bar to the label in centimeters.
     """
-    sep_cm: float = 0.2
+    separation_cm: float = 0.2
     offset_cm: float = 0.2
-    delta_text_cm: float = 0.1
+    text_offset_cm: float = 0.1
+
+
+@dataclass(frozen=True)
+class ColorBarConfig(FrozenConfigBase):
+    """Stores color bar configuration.
+    
+    Attributes:
+        width_cm: Width of the color bar in centimeters.
+        separation_cm: Separation between the color bar and the axes in centimeters.
+    """
+    width_cm: float = 0.3
+    separation_cm: float = 0.2
+
+    def __post_init__(self) -> None:
+        """Post-initialization checks for color bar.
+        
+        Raises:
+            ValueError: If width_cm or separation_cm is negative.
+        """
+        if self.width_cm <= 0 or self.separation_cm < 0:
+            raise ValueError(
+                "Color bar width must be positive and "
+                "separation must be non-negative."
+                )
 
 
 @dataclass(frozen=True)
@@ -229,19 +281,19 @@ class DebugPanel(FrozenConfigBase):
     
     Attributes:
         show: Whether to show the debug grid lines.
-        grid_res_cm: Resolution of the debug grid in centimeters.
+        grid_resolution_cm: Resolution of the debug grid in centimeters.
     """
     show: bool = False
-    grid_res_cm: float = 0.5
+    grid_resolution_cm: float = 0.5
 
     def __post_init__(self) -> None:
         """Post-initialization checks for debug panel.
         
         Raises:
-            ValueError: If grid_res_cm is negative.
+            ValueError: If grid_resolution_cm is negative.
         """
-        if self.grid_res_cm < 0:
-            raise ValueError("Grid resolution must be non-negative.")
+        if self.grid_resolution_cm <= 0:
+            raise ValueError("Grid resolution must be positive.")
 
 @dataclass(frozen=True)
 class PanelOutput(FrozenConfigBase):
@@ -275,19 +327,23 @@ class PanelBuilderConfig(FrozenConfigBase):
     the PanelBuilder class and use-case specific optional fields.
 
     Attributes:
-        panel_dimensions_cm: Overall panel dimensions in centimeters.
-        panel_margins_cm: Panel margin sizes in centimeters.
-        font_sizes_pt: Font sizes for different figure elements in points.
-        ax_separation_cm: Separation between adjacent axes in centimeters.
-        scale_bar_pos_cm: Position of the scale bar in centimeters.
+        panel_dimensions: Overall panel dimensions in centimeters.
+        panel_margins: Panel margin sizes in centimeters.
+        font_sizes: Font sizes for different figure elements in points.
+        axes_separation: Separation between adjacent axes in centimeters.
+        line_style: Line and marker styling configuration.
+        scalebar_config: Scale bar configuration.
+        colorbar_config: Color bar configuration.
         debug_panel: Debug panel configuration.
         panel_output: Output configuration for panels.
     """
-    panel_dimensions_cm: Dimensions
-    panel_margins_cm: Margins
-    font_sizes_pt: FontSizes
-    ax_separation_cm: AxSeparation = AxSeparation()
-    scale_bar_pos_cm: ScaleBar = ScaleBar()
+    panel_dimensions: Dimensions
+    panel_margins: Margins
+    font_sizes: FontSizes
+    axes_separation: AxesSeparation = AxesSeparation()
+    line_style: LineStyle = LineStyle()
+    scalebar_config: ScaleBarConfig = ScaleBarConfig()
+    colorbar_config: ColorBarConfig = ColorBarConfig()
     debug_panel: DebugPanel = DebugPanel()
     panel_output: PanelOutput = PanelOutput()
 

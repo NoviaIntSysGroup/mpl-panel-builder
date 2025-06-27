@@ -68,13 +68,13 @@ def test_from_dict_with_optional_ax_separation(
     """
     missing_ax_separation_dict = copy.deepcopy(sample_config_dict)
     # Remove the optional key to test default behavior
-    del missing_ax_separation_dict["ax_separation_cm"]
+    del missing_ax_separation_dict["axes_separation"]
     
     config = PanelBuilderConfig.from_dict(missing_ax_separation_dict)
     
-    # Should use defaults for ax_separation_cm
-    assert config.ax_separation_cm.x == pytest.approx(0.0)
-    assert config.ax_separation_cm.y == pytest.approx(0.0)
+    # Should use defaults for axes_separation
+    assert config.axes_separation.x_cm == pytest.approx(0.0)
+    assert config.axes_separation.y_cm == pytest.approx(0.0)
 
 
 def test_from_dict_missing_required_keys(
@@ -92,9 +92,9 @@ def test_from_dict_missing_required_keys(
         TypeError: Expected when required keys are missing.
     """
     required_keys = [
-        "panel_dimensions_cm",
-        "panel_margins_cm",
-        "font_sizes_pt"
+        "panel_dimensions",
+        "panel_margins",
+        "font_sizes"
     ]
     
     for key in required_keys:
@@ -121,7 +121,7 @@ def test_from_dict_invalid_nested_structure(
         TypeError: Expected when nested data structure is invalid.
     """
     invalid_dict = copy.deepcopy(sample_config_dict)
-    del invalid_dict["panel_dimensions_cm"]["height"]
+    del invalid_dict["panel_dimensions"]["height_cm"]
     
     with pytest.raises(TypeError):
         PanelBuilderConfig.from_dict(invalid_dict)
@@ -142,7 +142,7 @@ def test_from_dict_invalid_dimensions(
         ValueError: Expected when dimensions have invalid values.
     """
     invalid_dict = copy.deepcopy(sample_config_dict)
-    invalid_dict["panel_dimensions_cm"]["width"] = -10.0
+    invalid_dict["panel_dimensions"]["width_cm"] = -10.0
     
     with pytest.raises(ValueError):
         PanelBuilderConfig.from_dict(invalid_dict)

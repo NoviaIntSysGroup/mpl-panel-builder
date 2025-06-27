@@ -163,18 +163,18 @@ def test_fig_has_correct_margins(sample_config_dict: ConfigDict) -> None:
     ax = builder.axs[0][0]
 
     # Expected positions in figure coordinates (normalized 0–1)
-    total_width_cm = sample_config_dict["panel_dimensions_cm"]["width"]
-    total_height_cm = sample_config_dict["panel_dimensions_cm"]["height"]
-    margins = sample_config_dict["panel_margins_cm"]
+    total_width_cm = sample_config_dict["panel_dimensions"]["width_cm"]
+    total_height_cm = sample_config_dict["panel_dimensions"]["height_cm"]
+    margins = sample_config_dict["panel_margins"]
 
-    expected_x = margins["left"] / total_width_cm
-    expected_y = margins["bottom"] / total_height_cm
+    expected_x = margins["left_cm"] / total_width_cm
+    expected_y = margins["bottom_cm"] / total_height_cm
     expected_width = (total_width_cm 
-                      - margins["left"] 
-                      - margins["right"]) / total_width_cm
+                      - margins["left_cm"] 
+                      - margins["right_cm"]) / total_width_cm
     expected_height = (total_height_cm 
-                       - margins["top"] 
-                       - margins["bottom"]) / total_height_cm
+                       - margins["top_cm"] 
+                       - margins["bottom_cm"]) / total_height_cm
 
     assert pytest.approx(ax.get_position().x0) == expected_x
     assert pytest.approx(ax.get_position().y0) == expected_y

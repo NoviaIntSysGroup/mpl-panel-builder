@@ -25,21 +25,21 @@ example_name = current_dir.name
 # 1. Define the configuration
 config: dict[str, Any] = {
     # Panel dimensions in centimeters
-    "panel_dimensions_cm": {
-        "width": 6.0,   # 8 cm wide
-        "height": 5.0,  # 6 cm tall
+    "panel_dimensions": {
+        "width_cm": 6.0,   # 8 cm wide
+        "height_cm": 5.0,  # 6 cm tall
     },
     # Margins around the panel content (axes)
-    "panel_margins_cm": {
-        "top": 0.5,
-        "bottom": 1.5,
-        "left": 1.5,
-        "right": 0.5,
+    "panel_margins": {
+        "top_cm": 0.5,
+        "bottom_cm": 1.5,
+        "left_cm": 1.5,
+        "right_cm": 0.5,
     },
     # Font sizes in points
-    "font_sizes_pt": {
-        "axes": 8,      # font size for axis labels and ticks
-        "text": 6,      # font size for other text elements
+    "font_sizes": {
+        "axes_pt": 8,      # font size for axis labels and ticks
+        "text_pt": 6,      # font size for other text elements
     },
     # Optional keys (with default values)
     "panel_output": {
