@@ -3,7 +3,6 @@
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 [![Pre-commit](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/pre-commit.yml)
 [![tests](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/tests.yml/badge.svg)](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/tests.yml)
-![Black](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![Ruff](https://img.shields.io/badge/linter-ruff-0098db)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
@@ -63,21 +62,21 @@ from mpl_panel_builder.panel_builder import PanelBuilder
 # 1. Define the configuration
 config = {
     # Panel dimensions in centimeters
-    "panel_dimensions_cm": {
-        "width": 6.0,   # 8 cm wide
-        "height": 5.0,  # 6 cm tall
+    "panel_dimensions": {
+        "width_cm": 6.0,
+        "height_cm": 5.0,
     },
     # Margins around the panel content (axes)
-    "panel_margins_cm": {
-        "top": 0.5,
-        "bottom": 1.5,
-        "left": 1.5,
-        "right": 0.5,
+    "panel_margins": {
+        "top_cm": 0.5,
+        "bottom_cm": 1.5,
+        "left_cm": 1.5,
+        "right_cm": 0.5,
     },
     # Font sizes in points
-    "font_sizes_pt": {
-        "axes": 8,      # font size for axis labels and ticks
-        "text": 6,      # font size for other text elements
+    "font_sizes": {
+        "axes_pt": 8,
+        "text_pt": 6,
     }
 }
 
@@ -111,13 +110,20 @@ fig = panel()  # This creates and returns the figure panel
 
 The repository includes example scripts that demonstrate both panel creation and how to programmatically assemble panels into complete figures using additional tools (TikZ and Poppler). All generated files are stored under `outputs/`.
 
-### Example 1: Config key visualization
+### Example 1: Minimal example
 
 ```bash
 # Create panels only
-python examples/config_visualization/create_panels.py
+python examples/ex_1_minimal_example/create_panels.py
+```
+
+### Example 2: Config key visualization
+
+```bash
+# Create panels only
+python examples/ex_2_config_visualization/create_panels.py
 # Create complete figure, requires TikZ and Poppler
-python examples/config_visualization/create_figure.py
+python examples/ex_2_config_visualization/create_figure.py
 ```
 
 <img src="outputs/ex_2_config_visualization/figure.png" style="max-width: 500px; width: 100%; height: auto;" />  
@@ -161,7 +167,7 @@ We welcome contributions! Please follow these steps:
 7. Open a Pull Request
 
 Please ensure your code follows our style guidelines:
-- Use Black for code formatting
+- Use Ruff for code formatting and linting
 - Follow Google's Python style guide for docstrings
 - Include type annotations for all functions
 - Add tests for new functionality

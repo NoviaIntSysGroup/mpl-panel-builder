@@ -26,8 +26,8 @@ example_name = current_dir.name
 config: dict[str, Any] = {
     # Panel dimensions in centimeters
     "panel_dimensions": {
-        "width_cm": 6.0,   # 8 cm wide
-        "height_cm": 5.0,  # 6 cm tall
+        "width_cm": 6.0,
+        "height_cm": 5.0,
     },
     # Margins around the panel content (axes)
     "panel_margins": {

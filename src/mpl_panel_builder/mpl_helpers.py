@@ -17,6 +17,9 @@ def cm_to_inches(cm: float) -> float:
     
     Args:
         cm: The value in centimeters.
+        
+    Returns:
+        The value in inches.
     """
     return cm / 2.54
 
@@ -25,6 +28,9 @@ def inches_to_cm(inch: float) -> float:
     
     Args:
         inch: The value in inches.
+        
+    Returns:
+        The value in centimeters.
     """
     return inch * 2.54
 
@@ -33,6 +39,9 @@ def cm_to_pt(cm: float) -> float:
     
     Args:
         cm: The value in centimeters.
+        
+    Returns:
+        The value in points.
     """
     return cm_to_inches(cm) * 72
 

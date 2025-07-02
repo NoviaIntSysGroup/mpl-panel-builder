@@ -1,8 +1,44 @@
 """Tests for mpl_helpers module."""
 
 import numpy as np
+import pytest
 
-from mpl_panel_builder.mpl_helpers import get_default_colors, get_pastel_colors
+from mpl_panel_builder.mpl_helpers import (
+    cm_to_inches,
+    cm_to_pt,
+    get_default_colors,
+    get_pastel_colors,
+    inches_to_cm,
+    pt_to_cm,
+)
+
+
+def test_cm_to_inches() -> None:
+    """Test centimeter to inch conversion."""
+    # Test known conversions
+    assert cm_to_inches(2.54) == pytest.approx(1.0)
+    assert cm_to_inches(0.0) == 0.0
+
+
+def test_inches_to_cm() -> None:
+    """Test inch to centimeter conversion."""
+    # Test known conversions
+    assert inches_to_cm(1.0) == pytest.approx(2.54)
+    assert inches_to_cm(0.0) == 0.0
+
+
+def test_cm_to_pt() -> None:
+    """Test centimeter to point conversion."""
+    # Test known conversions (1 inch = 72 points)
+    assert cm_to_pt(2.54) == pytest.approx(72.0)
+    assert cm_to_pt(0.0) == 0.0
+
+
+def test_pt_to_cm() -> None:
+    """Test point to centimeter conversion."""
+    # Test known conversions
+    assert pt_to_cm(72.0) == pytest.approx(2.54)
+    assert pt_to_cm(0.0) == 0.0
 
 
 def test_get_default_colors() -> None:
