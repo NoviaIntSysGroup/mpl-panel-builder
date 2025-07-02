@@ -18,7 +18,7 @@ from matplotlib.axes import Axes
 # Add the project root to sys.path to allow importing helpers module
 sys.path.append(str(Path(__file__).parent.parent.parent.absolute()))
 from examples.helpers import get_logger, get_project_root
-from mpl_panel_builder.mpl_helpers import cm_to_rel, create_full_figure_axes
+from mpl_panel_builder.mpl_helpers import cm_to_fig_rel, create_full_figure_axes
 from mpl_panel_builder.panel_builder import PanelBuilder
 
 logger = get_logger(__name__)
@@ -84,8 +84,8 @@ class DimPanelDemo(PanelBuilder):
         ax_panel.plot([0, 1], [delta, delta], self.config.plot_styles.config)
         ax_panel.plot([delta, delta], [0, 1], self.config.plot_styles.config)
 
-        padding_rel_x = cm_to_rel(self.fig, margin / 2, "width")
-        padding_rel_y = cm_to_rel(self.fig, margin / 2, "height")
+        padding_rel_x = cm_to_fig_rel(self.fig, margin / 2, "width")
+        padding_rel_y = cm_to_fig_rel(self.fig, margin / 2, "height")
         shared_text_args: dict[str, Any] = {
             "ha": "center",
             "va": "center",
