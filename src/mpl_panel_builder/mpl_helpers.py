@@ -1,15 +1,12 @@
 """Helper functions for matplotlib."""
 
-from typing import TYPE_CHECKING, Literal, cast
+from typing import Literal, cast
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure, SubFigure
 from numpy.typing import NDArray
-
-if TYPE_CHECKING:
-    pass
 
 
 def cm_to_inches(cm: float) -> float:
@@ -58,11 +55,10 @@ def pt_to_cm(pt: float) -> float:
     """
     return inches_to_cm(pt / 72)
 
-
-def cm_to_rel(
+def cm_to_fig_rel(
     fig: Figure | SubFigure, cm: float, dim: Literal["width", "height"]
 ) -> float:
-    """Convert centimeters to relative coordinates.
+    """Convert centimeters to relative figure coordinates.
     
     This is a simple conversion factor.
 
@@ -86,8 +82,8 @@ def cm_to_rel(
         return cm_to_inches(cm) / float(size_inches[1])
     else:
         raise ValueError(f"Invalid dimension: {dim}")
-    
-def rel_to_cm(
+
+def fig_rel_to_cm(
     fig: Figure | SubFigure, rel: float, dim: Literal["width", "height"]
 ) -> float:
     """Convert relative coordinates to centimeters.
@@ -110,6 +106,38 @@ def rel_to_cm(
         return inches_to_cm(rel * float(size_inches[0]))
     elif dim == "height":
         return inches_to_cm(rel * float(size_inches[1]))
+    else:
+        raise ValueError(f"Invalid dimension: {dim}")
+
+def cm_to_axes_rel(
+    ax: Axes, cm: float, dim: Literal["width", "height"]
+) -> float:
+    """Convert centimeters to relative axes coordinates.
+    
+    Converts a distance in centimeters to relative coordinates for use with 
+    ax.transAxes transform.
+    
+    Args:
+        ax: The matplotlib Axes object to convert coordinates for.
+        cm: The distance in centimeters.
+        dim: The dimension to convert to relative coordinates.
+        
+    Returns:
+        The value in relative axes coordinates.
+    """
+    fig = ax.get_figure()
+    if fig is None:
+        raise ValueError("Axes must be attached to a figure")
+    
+    # Convert to figure relative coordinates first
+    fig_rel = cm_to_fig_rel(fig, cm, dim)
+    
+    # Convert from figure coordinates to axes coordinates
+    ax_pos = ax.get_position()
+    if dim == "width":
+        return float(fig_rel / ax_pos.width)
+    elif dim == "height":
+        return float(fig_rel / ax_pos.height)
     else:
         raise ValueError(f"Invalid dimension: {dim}")
 
@@ -219,9 +247,9 @@ def adjust_axes_size(
     
     # Convert length to relative coordinates
     if direction in ["left", "right"]:
-        length_rel = cm_to_rel(fig, length_cm, "width")
+        length_rel = cm_to_fig_rel(fig, length_cm, "width")
     else:  # "bottom", "top"
-        length_rel = cm_to_rel(fig, length_cm, "height")
+        length_rel = cm_to_fig_rel(fig, length_cm, "height")
     
     # Adjust position based on direction
     if direction == "left":
@@ -264,8 +292,8 @@ def calculate_colorbar_position(
     is_vertical = position in ["left", "right"]
     dimension_type: Literal["width", "height"] = "width" if is_vertical else "height"
     
-    width_rel = cm_to_rel(fig, width_cm, dimension_type)
-    sep_rel = cm_to_rel(fig, separation_cm, dimension_type)
+    width_rel = cm_to_fig_rel(fig, width_cm, dimension_type)
+    sep_rel = cm_to_fig_rel(fig, separation_cm, dimension_type)
     
     if position == "left":
         return (

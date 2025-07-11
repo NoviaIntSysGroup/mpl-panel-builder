@@ -227,8 +227,8 @@ def test_string_number_conversion(sample_config_dict: ConfigDict) -> None:
     second_section = sections[1]
     
     # Get first key from each section
-    first_key = list(sample_config_dict[first_section].keys())[0]
-    second_key = list(sample_config_dict[second_section].keys())[0]
+    first_key = next(iter(sample_config_dict[first_section].keys()))
+    second_key = next(iter(sample_config_dict[second_section].keys()))
     
     updates = {
         first_section: {first_key: "15.5"},
@@ -254,7 +254,7 @@ def test_nonexistent_key_error(sample_config_dict: ConfigDict) -> None:
         KeyError: Expected when trying to override a non-existent key.
     """
     # Get first section for testing
-    first_section = list(sample_config_dict.keys())[0]
+    first_section = next(iter(sample_config_dict.keys()))
     
     # Test non-existent section
     updates = {
@@ -302,8 +302,8 @@ def test_invalid_override_formats(
         ValueError: Expected when an invalid override format is provided.
     """
     # Get first section and its first key for testing
-    first_section = list(sample_config_dict.keys())[0]
-    first_key = list(sample_config_dict[first_section].keys())[0]
+    first_section = next(iter(sample_config_dict.keys()))
+    first_key = next(iter(sample_config_dict[first_section].keys()))
     
     updates = {
         first_section: {first_key: invalid_format}
@@ -325,8 +325,8 @@ def test_original_config_preserved(sample_config_dict: ConfigDict) -> None:
         None
     """
     # Get first section and its first key for testing
-    first_section = list(sample_config_dict.keys())[0]
-    first_key = list(sample_config_dict[first_section].keys())[0]
+    first_section = next(iter(sample_config_dict.keys()))
+    first_key = next(iter(sample_config_dict[first_section].keys()))
     
     original_value = sample_config_dict[first_section][first_key]
     
@@ -386,8 +386,8 @@ def test_config_creation_with_overrides(
         None
     """
     # Get first section and its first key for testing
-    first_section = list(sample_config_dict.keys())[0]
-    first_key = list(sample_config_dict[first_section].keys())[0]
+    first_section = next(iter(sample_config_dict.keys()))
+    first_key = next(iter(sample_config_dict[first_section].keys()))
     
     # Get original value for verification
     original_value = sample_config_dict[first_section][first_key]
@@ -420,8 +420,8 @@ def test_config_override_error_propagation(
         ValueError: Expected when an invalid override format is provided.
     """
     # Get first section and its first key for testing
-    first_section = list(sample_config_dict.keys())[0]
-    first_key = list(sample_config_dict[first_section].keys())[0]
+    first_section = next(iter(sample_config_dict.keys()))
+    first_key = next(iter(sample_config_dict[first_section].keys()))
     
     # Invalid override should fail before PanelConfig creation
     invalid_overrides = {

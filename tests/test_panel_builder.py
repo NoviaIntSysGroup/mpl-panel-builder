@@ -30,6 +30,13 @@ def make_dummy_panel_class(
         A PanelBuilder subclass with the specified dimensions.
     """
     # Use locals to assign class attributes via metaprogramming
+    def build_panel(self: PanelBuilder) -> str | None:
+        """Dummy build_panel method that also tests suffix functionality."""
+        # Simple plot to make the panel functional
+        self.axs[0][0].plot([0, 1], [0, 1])
+        # Return the suffix for filename generation
+        return suffix
+    
     return type(
         "DummyPanel",
         (PanelBuilder,),
@@ -37,9 +44,7 @@ def make_dummy_panel_class(
             "_panel_name": panel_name,
             "_n_rows": n_rows,
             "_n_cols": n_cols,
-            "build_panel": lambda self, suffix=suffix: (
-                self.axs[0][0].plot([0, 1], [0, 1]), suffix
-            )[1],
+            "build_panel": build_panel,
         }
     )
 
@@ -162,7 +167,7 @@ def test_fig_has_correct_margins(sample_config_dict: ConfigDict) -> None:
     _ = builder()
     ax = builder.axs[0][0]
 
-    # Expected positions in figure coordinates (normalized 0–1)
+    # Expected positions in figure coordinates (normalized 0-1)
     total_width_cm = sample_config_dict["panel_dimensions"]["width_cm"]
     total_height_cm = sample_config_dict["panel_dimensions"]["height_cm"]
     margins = sample_config_dict["panel_margins"]

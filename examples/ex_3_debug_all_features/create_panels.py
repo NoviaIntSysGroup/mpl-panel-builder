@@ -99,7 +99,12 @@ class DebugPanel(PanelBuilder):
         )
         # Test y scale bar
         self.draw_scale_bar(ax, 1, "1 cm", "y")
-        
+        # Test description
+        self.draw_description(ax, "NW", loc="northwest", bg_color="lightgrey")
+        self.draw_description(ax, "NE", loc="northeast", bg_color="lightgrey")
+        self.draw_description(ax, "SW", loc="southwest", bg_color="lightgrey")
+        self.draw_description(ax, "SE", loc="southeast", bg_color="lightgrey")
+
         # Top right
         ax = self.axs[0][1]
         scatter = _scatter_fun(ax)
@@ -116,7 +121,7 @@ class DebugPanel(PanelBuilder):
         for pos in positions:
             cbar = self.add_colorbar(scatter, ax, pos, shrink_axes=False)
             # Remove colorbar outline
-            cbar.outline.set_visible(False)
+            cbar.outline.set_visible(False) # type: ignore
             # Remove tick lines
             cbar.ax.tick_params(length=0)
 

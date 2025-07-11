@@ -7,6 +7,7 @@ figures:
   axes_separation: {x_cm: 1.0, y_cm: 1.0}
   scalebar_config: {separation_cm: 0.5, offset_cm: 0.5, text_offset_cm: 0.5}
   colorbar_config: {width_cm: 0.5, separation_cm: 0.5}
+  description_config: {margin_cm: 0.5}
   panel_output: {directory: "output", format: "pdf", dpi: 600}
   debug_panel: {show: True, grid_resolution_cm: 0.5}
   # Custom fields

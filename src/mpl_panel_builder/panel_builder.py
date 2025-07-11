@@ -261,9 +261,11 @@ class PanelBuilder:
         overlay_ax = mpl_helpers.create_full_figure_axes(self.fig)
 
         if direction == "x":
-            sep_rel = mpl_helpers.cm_to_rel(self.fig, sep_cm, "height")
-            offset_rel = mpl_helpers.cm_to_rel(self.fig, offset_cm, "width")
-            delta_text_rel = mpl_helpers.cm_to_rel(self.fig, delta_text_cm, "height")
+            sep_rel = mpl_helpers.cm_to_fig_rel(self.fig, sep_cm, "height")
+            offset_rel = mpl_helpers.cm_to_fig_rel(self.fig, offset_cm, "width")
+            delta_text_rel = mpl_helpers.cm_to_fig_rel(
+                self.fig, delta_text_cm, "height"
+            )
 
             ax_lim = ax.get_xlim()
             length_rel = ax_bbox.width / (ax_lim[1] - ax_lim[0]) * length
@@ -282,14 +284,16 @@ class PanelBuilder:
             )
         
         elif direction == "y":
-            sep_rel = mpl_helpers.cm_to_rel(self.fig, sep_cm, "width")
-            offset_rel = mpl_helpers.cm_to_rel(self.fig, offset_cm, "height")
-            delta_text_rel = mpl_helpers.cm_to_rel(self.fig, delta_text_cm, "width")
+            sep_rel = mpl_helpers.cm_to_fig_rel(self.fig, sep_cm, "width")
+            offset_rel = mpl_helpers.cm_to_fig_rel(self.fig, offset_cm, "height")
+            delta_text_rel = mpl_helpers.cm_to_fig_rel(self.fig, delta_text_cm, "width")
             # The ascender length is roughly 0.25 of the font size for the default font
             # We therefore move the text this amount to make it appear to have the 
             # same distance to the scale bar as the text for the x-direction.
             font_offset_cm = mpl_helpers.pt_to_cm(font_size_pt) * 0.25
-            delta_text_rel -= mpl_helpers.cm_to_rel(self.fig, font_offset_cm, "width")
+            delta_text_rel -= mpl_helpers.cm_to_fig_rel(
+                self.fig, font_offset_cm, "width"
+            )
 
             # Get the length of the scale bar in relative coordinates   
             ax_lim = ax.get_ylim()
@@ -371,6 +375,79 @@ class PanelBuilder:
         
         return cbar
     
+    def draw_description(
+        self,
+        ax: MatplotlibAxes,
+        text: str,
+        loc: str = "northwest",
+        color: tuple[float, float, float] | str = (0, 0, 0),
+        bg_color: tuple[float, float, float] | str = "none",
+    ) -> None:
+        """Add a description text inside the axes at a specified corner location.
+
+        Args:
+            ax: The matplotlib Axes object to annotate.
+            text: The text to display as the description.
+            loc: The corner location for the description. Must be one of
+                'northwest', 'southwest', 'southeast', 'northeast'. Defaults to
+                'northwest'.
+            color: Text color. Defaults to black.
+            bg_color: Background color behind the text. Defaults to "none".
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If `loc` is not one of the allowed position keywords.
+        """
+        font_size_pt = self.config.font_sizes.text_pt
+        margin_cm = self.config.description_config.margin_cm
+        delta_x = mpl_helpers.cm_to_axes_rel(ax, margin_cm, "width")
+        delta_y = mpl_helpers.cm_to_axes_rel(ax, margin_cm, "height")
+
+        if "south" in loc:
+            # The ascender length is roughly 0.25 of the font size for the default font
+            # We therefore move the text this amount to make it appear to have the 
+            # same distance to the scale bar as the text for the x-direction.
+            font_offset_cm = mpl_helpers.pt_to_cm(font_size_pt) * 0.25
+            delta_y -= mpl_helpers.cm_to_axes_rel(
+                ax, font_offset_cm, "height"
+            )
+
+        if loc == "northwest":
+            x, y = delta_x, 1 - delta_y
+            ha, va = "left", "top"
+        elif loc == "southwest":
+            x, y = delta_x, delta_y
+            ha, va = "left", "bottom"
+        elif loc == "southeast":
+            x, y = 1 - delta_x, delta_y
+            ha, va = "right", "bottom"
+        elif loc == "northeast":
+            x, y = 1 - delta_x, 1 - delta_y
+            ha, va = "right", "top"
+        else:
+            raise ValueError(
+                "Invalid 'loc' value. Must be one of: "
+                "'northwest', 'southwest', 'southeast', 'northeast'."
+            )
+
+        ax.text(
+            x,
+            y,
+            text,
+            transform=ax.transAxes,
+            color=color,
+            fontsize=font_size_pt,
+            ha=ha,
+            va=va,
+            bbox={
+                "facecolor": bg_color,
+                "edgecolor": "none",
+                "boxstyle": "square,pad=0",
+            },
+        )
+    
     def draw_debug_lines(self) -> None:
         """Draw debug grid lines if enabled in the configuration."""
         if not self.config.debug_panel.show:
@@ -451,7 +528,7 @@ class PanelBuilder:
 
         except Exception as e:
             warnings.warn(
-                f"Failed to save figure: {str(e)}",
+                f"Failed to save figure: {e!s}",
                 UserWarning,
                 stacklevel=2,
             )

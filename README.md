@@ -43,13 +43,8 @@ If you want to explore the examples or contribute to the project, follow these s
 $ git clone https://github.com/NoviaIntSysGroup/mpl-panel-builder.git
 $ cd mpl-panel-builder
 
-# create the conda environment and use it with Poetry
-$ conda env create -f environment.yml
-$ conda activate mpl-panel-builder
-$ poetry config virtualenvs.create false
-
-# install package and notebook extras
-$ poetry install --with notebook
+# install package and development dependencies
+$ uv sync
 ```
 
 ## Usage
@@ -142,16 +137,16 @@ python examples/ex_2_config_visualization/create_figure.py
 Install development requirements and set up the hooks:
 
 ```bash
-poetry install --with dev,notebook
-poetry run pre-commit install --hook-type pre-commit --hook-type pre-push
+uv sync
+uv run pre-commit install --hook-type pre-commit --hook-type pre-push
 ```
 
 Before committing or pushing run:
 
 ```bash
-poetry run ruff check .
-poetry run mypy .
-poetry run pytest
+uv run ruff check .
+uv run pyright
+uv run pytest
 ```
 
 ## Contributing
@@ -161,13 +156,14 @@ We welcome contributions! Please follow these steps:
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
-4. Run the test suite (`poetry run pytest`)
+4. Run the test suite (`uv run pytest`)
 5. Commit your changes (`git commit -m 'Add amazing feature'`)
 6. Push to the branch (`git push origin feature/amazing-feature`)
 7. Open a Pull Request
 
 Please ensure your code follows our style guidelines:
 - Use Ruff for code formatting and linting
+- Use Pyright for type checking
 - Follow Google's Python style guide for docstrings
 - Include type annotations for all functions
 - Add tests for new functionality

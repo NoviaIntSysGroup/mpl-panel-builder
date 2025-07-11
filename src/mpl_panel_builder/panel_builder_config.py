@@ -296,6 +296,25 @@ class DebugPanel(FrozenConfigBase):
             raise ValueError("Grid resolution must be positive.")
 
 @dataclass(frozen=True)
+class DescriptionConfig(FrozenConfigBase):
+    """Stores description text configuration.
+    
+    Attributes:
+        margin_cm: Margin from axes edge to description text in centimeters.
+    """
+    margin_cm: float = 0.2
+
+    def __post_init__(self) -> None:
+        """Post-initialization checks for description config.
+        
+        Raises:
+            ValueError: If margin_cm is negative.
+        """
+        if self.margin_cm < 0:
+            raise ValueError("Description margin must be non-negative.")
+
+
+@dataclass(frozen=True)
 class PanelOutput(FrozenConfigBase):
     """Stores output configuration for panels.
     
@@ -334,6 +353,7 @@ class PanelBuilderConfig(FrozenConfigBase):
         line_style: Line and marker styling configuration.
         scalebar_config: Scale bar configuration.
         colorbar_config: Color bar configuration.
+        description_config: Description text configuration.
         debug_panel: Debug panel configuration.
         panel_output: Output configuration for panels.
     """
@@ -344,6 +364,7 @@ class PanelBuilderConfig(FrozenConfigBase):
     line_style: LineStyle = LineStyle()
     scalebar_config: ScaleBarConfig = ScaleBarConfig()
     colorbar_config: ColorBarConfig = ColorBarConfig()
+    description_config: DescriptionConfig = DescriptionConfig()
     debug_panel: DebugPanel = DebugPanel()
     panel_output: PanelOutput = PanelOutput()
 

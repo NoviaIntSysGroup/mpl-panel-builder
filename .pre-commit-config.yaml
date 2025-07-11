@@ -1,24 +1,28 @@
 repos:
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.13
+  - repo: local
     hooks:
       - id: ruff
+        name: ruff
+        entry: uv run ruff check
+        language: system
+        types: [python] 
         stages: [pre-commit]
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.16.0
+  - repo: local
     hooks:
-      - id: mypy
-        additional_dependencies:
-          - pytest
-          - types-PyYAML
+      - id: pyright
+        name: pyright
+        entry: uv run pyright
+        language: system
+        pass_filenames: false
+        types: [python] 
         stages: [pre-commit]
 
   - repo: local
     hooks:
     - id: run-pytest
       name: Run pytest before push
-      entry: poetry run pytest
+      entry: uv run pytest
       language: system
       pass_filenames: false
       always_run: true
