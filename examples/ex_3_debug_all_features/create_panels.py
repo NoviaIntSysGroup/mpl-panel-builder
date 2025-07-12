@@ -98,7 +98,7 @@ class DebugPanel(PanelBuilder):
             yticks=[],
         )
         # Test y scale bar
-        self.draw_scale_bar(ax, 1, "1 cm", "y")
+        self.draw_y_scale_bar(ax, 1, "1 cm")
         # Test description
         self.draw_description(ax, "NW", loc="northwest", bg_color="lightgrey")
         self.draw_description(ax, "NE", loc="northeast", bg_color="lightgrey")
@@ -143,7 +143,7 @@ class DebugPanel(PanelBuilder):
             yticks=[],
         )
         # Test x scale bar
-        self.draw_scale_bar(ax, 1, "1 cm", "x")
+        self.draw_x_scale_bar(ax, 1, "1 cm")
 
 if __name__ == "__main__":
     logger.info("Creating panel with class: %s", DebugPanel.__name__)
