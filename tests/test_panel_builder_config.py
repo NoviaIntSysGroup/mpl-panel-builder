@@ -432,3 +432,33 @@ def test_config_override_error_propagation(
     with pytest.raises(ValueError, match=error_msg):
         updated_dict = override_config(sample_config_dict, invalid_overrides)
         PanelBuilderConfig.from_dict(updated_dict)  # This line shouldn't be reached
+
+
+def test_describe_config_returns_string() -> None:
+    """Test that describe_config runs without errors and returns a string.
+    
+    Returns:
+        None
+    """
+    # Test with default parameters
+    result = PanelBuilderConfig.describe_config()
+    assert isinstance(result, str)
+    assert len(result) > 0
+    assert "PanelBuilderConfig Configuration Reference" in result
+    
+    # Test with show_types=False
+    result_no_types = PanelBuilderConfig.describe_config(show_types=False)
+    assert isinstance(result_no_types, str)
+    assert len(result_no_types) > 0
+    
+    # Test with show_defaults=False
+    result_no_defaults = PanelBuilderConfig.describe_config(show_defaults=False)
+    assert isinstance(result_no_defaults, str)
+    assert len(result_no_defaults) > 0
+    
+    # Test with both disabled
+    result_minimal = PanelBuilderConfig.describe_config(
+        show_types=False, show_defaults=False
+    )
+    assert isinstance(result_minimal, str)
+    assert len(result_minimal) > 0

@@ -1,10 +1,16 @@
-name: Pre-commit
+name: Ruff Lint
 
 on:
   push:
-    branches: [ main, 'feature/*', 'develop' ]
+    branches:
+      - main
+      - 'feature/*'
+      - develop
   pull_request:
-    branches: [ main, 'feature/*', 'develop' ]
+    branches:
+      - main
+      - 'feature/*'
+      - develop
 
 jobs:
   pre-commit:
@@ -23,5 +29,5 @@ jobs:
     - name: Install dependencies
       run: uv sync
 
-    - name: Run pre-commit
-      run: uv run pre-commit run --all-files
+    - name: Run Ruff
+      run: uv run ruff check

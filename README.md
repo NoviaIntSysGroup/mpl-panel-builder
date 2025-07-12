@@ -1,12 +1,25 @@
-# mpl-panel-builder
+<p align="center">
+    <img src="images/mpl-panel-builder-logo.png" alt="mpl-panel-builder logo" width="256px" >   
+</p>
+
+<h2 align="center"> Create publication-quality scientific figure panels with a consistent layout</h2>
+
+<div align="center">
+
+[![Ruff Lint](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/lint.yml/badge.svg)](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/lint.yml)
+[![Pyright Type Check](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/typecheck.yml/badge.svg)](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/typecheck.yml)
+[![Unit Tests](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/tests.yml/badge.svg)](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/tests.yml)
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
-[![Pre-commit](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/pre-commit.yml)
-[![tests](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/tests.yml/badge.svg)](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/tests.yml)
-![Ruff](https://img.shields.io/badge/linter-ruff-0098db)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
+</div>
+
+<div align="center">
+
 `mpl-panel-builder` helps you compose matplotlib-based publication-quality scientific figure panels with precise and repeatable layouts. The shared precise layout lets you align panels perfectly into complete figures by simply stacking them vertically or horizontally. Included example scripts emphasize both how to create panels and how these can be combined with TikZ to obtain a complete figure creation pipeline that is fully reproducible and under version control in Git. 
+
+</div>
 
 ## Features
 
@@ -100,6 +113,22 @@ class MyPanel(PanelBuilder):
 panel = MyPanel(config)
 fig = panel()  # This creates and returns the figure panel
 ```
+
+### Configuration Documentation
+
+To explore all available configuration options, use the built-in documentation feature:
+
+```python
+from mpl_panel_builder.panel_builder_config import PanelBuilderConfig
+
+# Display all configuration keys with descriptions
+print(PanelBuilderConfig.describe_config())
+
+# Minimal output (no types or defaults)
+print(PanelBuilderConfig.describe_config(show_types=False, show_defaults=False))
+```
+
+This provides a hierarchical overview of all configuration options, including required and optional fields with their descriptions, types, and default values.
 
 ## Examples
 

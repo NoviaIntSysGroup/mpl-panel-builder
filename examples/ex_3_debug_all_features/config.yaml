@@ -1,18 +1,41 @@
 figures:
   # Required fields
-  panel_dimensions: {width_cm: 11, height_cm: 11}
-  panel_margins: {left_cm: 1.5, bottom_cm: 1.5, right_cm: 0.5, top_cm: 0.5}
-  font_sizes: {axes_pt: 8, text_pt: 6}
+  panel_dimensions: 
+    width_cm: 11 
+    height_cm: 11
+  panel_margins:
+    left_cm: 1.5
+    bottom_cm: 1.5
+    right_cm: 0.5
+    top_cm: 0.5
+  font_sizes: 
+    axes_pt: 8
+    text_pt: 6
   # Optional fields
-  axes_separation: {x_cm: 1.0, y_cm: 1.0}
-  scalebar_config: {separation_cm: 0.5, offset_cm: 0.5, text_offset_cm: 0.5}
-  colorbar_config: {width_cm: 0.5, separation_cm: 0.5}
-  description_config: {margin_cm: 0.5}
-  panel_output: {directory: "output", format: "pdf", dpi: 600}
-  debug_panel: {show: True, grid_resolution_cm: 0.5}
+  axes_separation: 
+    x_cm: 1.0
+    y_cm: 1.0
+  line_style:
+    line_width_pt: 3.0
+    marker_size_pt: 4.0
+  scalebar_config: 
+    separation_cm: 0.5
+    offset_cm: 0.5
+    text_offset_cm: 0.5
+  colorbar_config: 
+    width_cm: 0.5
+    separation_cm: 0.5
+  description_config: 
+    margin_cm: 0.5
+  panel_output: 
+    directory: "output"
+    format: "pdf"
+    dpi: 600
+  debug_panel: 
+    show: True
+    grid_resolution_cm: 0.5
   # Custom fields
   colors:
-    color_1: [0.8500, 0.3250, 0.0980]
-    color_2: [0.4660, 0.6740, 0.1880]
-    color_3: [0.4940, 0.1840, 0.5560]
-    color_4: [0, 0.4470, 0.7410]
+    color_1: [0.8500, 0.3250, 0.0980]  # reddish-orange
+    color_2: [0.0980, 0.8500, 0.3250]  # complementary greenish
+    color_3: [0.3250, 0.0980, 0.8500]  # complementary bluish

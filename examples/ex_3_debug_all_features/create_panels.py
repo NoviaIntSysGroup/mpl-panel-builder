@@ -55,15 +55,16 @@ def _get_xy_data() -> tuple[np.ndarray, np.ndarray]:
     return x, y
 
 # Example specific helper functions
-def _plot_fun(ax: Axes) -> None:
+def _plot_fun(ax: Axes, color: tuple[float, float, float] = (0, 0, 0)) -> None:
     """Plot a simple function.
 
     Args:
         ax: Axes to plot on.
+        color: Color of the plot line. Defaults to black.
     """
 
     x, y = _get_xy_data()
-    ax.plot(x, y, label="$y=x$")
+    ax.plot(x, y, label="$y=x$", color=color)
     ax.set(xlim=[x.min(), x.max()], ylim=[y.min(), y.max()])
 
 # Example specific helper functions
@@ -92,13 +93,13 @@ class DebugPanel(PanelBuilder):
 
         # Top left
         ax = self.axs[0][0]
-        _plot_fun(ax)
+        _plot_fun(ax, color=self.config.colors.color_1)
         ax.set(
             xticks=[],
             yticks=[],
         )
         # Test y scale bar
-        self.draw_scale_bar(ax, 1, "1 cm", "y")
+        self.draw_y_scale_bar(ax, 1, "1 cm")
         # Test description
         self.draw_description(ax, "NW", loc="northwest", bg_color="lightgrey")
         self.draw_description(ax, "NE", loc="northeast", bg_color="lightgrey")
@@ -127,7 +128,7 @@ class DebugPanel(PanelBuilder):
 
         # Bottom left
         ax = self.axs[1][0]
-        _plot_fun(ax)
+        _plot_fun(ax, color=self.config.colors.color_2)
         ax.set(
             xlabel="X axis (cm)",
             ylabel="Y axis (cm)",
@@ -137,13 +138,13 @@ class DebugPanel(PanelBuilder):
 
         # Bottom right
         ax = self.axs[1][1]
-        _plot_fun(ax)
+        _plot_fun(ax, color=self.config.colors.color_3)
         ax.set(
             xticks=[],
             yticks=[],
         )
         # Test x scale bar
-        self.draw_scale_bar(ax, 1, "1 cm", "x")
+        self.draw_x_scale_bar(ax, 1, "1 cm")
 
 if __name__ == "__main__":
     logger.info("Creating panel with class: %s", DebugPanel.__name__)

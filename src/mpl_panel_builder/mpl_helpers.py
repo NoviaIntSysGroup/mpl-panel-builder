@@ -69,7 +69,16 @@ def cm_to_fig_rel(
 
     Returns:
         The value in relative coordinates.
+    
+    Raises:
+        ValueError: If dim is not "width" or "height".
     """
+    valid_dims = ["width", "height"]
+    if dim not in valid_dims:
+        raise ValueError(
+            f"Invalid dimension: {dim!r}. Must be one of: {valid_dims!r}."
+        )
+    
     if hasattr(fig, 'get_size_inches'):
         size_inches = fig.get_size_inches()
     else:
@@ -81,7 +90,8 @@ def cm_to_fig_rel(
     elif dim == "height":
         return cm_to_inches(cm) / float(size_inches[1])
     else:
-        raise ValueError(f"Invalid dimension: {dim}")
+        # This should never be reached due to validation above
+        raise ValueError(f"Invalid dimension: {dim!r}")
 
 def fig_rel_to_cm(
     fig: Figure | SubFigure, rel: float, dim: Literal["width", "height"]
@@ -95,7 +105,16 @@ def fig_rel_to_cm(
 
     Returns:
         The value in centimeters.
+    
+    Raises:
+        ValueError: If dim is not "width" or "height".
     """
+    valid_dims = ["width", "height"]
+    if dim not in valid_dims:
+        raise ValueError(
+            f"Invalid dimension: {dim!r}. Must be one of: {valid_dims!r}."
+        )
+    
     if hasattr(fig, 'get_size_inches'):
         size_inches = fig.get_size_inches()
     else:
@@ -107,7 +126,8 @@ def fig_rel_to_cm(
     elif dim == "height":
         return inches_to_cm(rel * float(size_inches[1]))
     else:
-        raise ValueError(f"Invalid dimension: {dim}")
+        # This should never be reached due to validation above
+        raise ValueError(f"Invalid dimension: {dim!r}")
 
 def cm_to_axes_rel(
     ax: Axes, cm: float, dim: Literal["width", "height"]
@@ -124,7 +144,16 @@ def cm_to_axes_rel(
         
     Returns:
         The value in relative axes coordinates.
+    
+    Raises:
+        ValueError: If dim is not "width" or "height".
     """
+    valid_dims = ["width", "height"]
+    if dim not in valid_dims:
+        raise ValueError(
+            f"Invalid dimension: {dim!r}. Must be one of: {valid_dims!r}."
+        )
+    
     fig = ax.get_figure()
     if fig is None:
         raise ValueError("Axes must be attached to a figure")
@@ -139,7 +168,8 @@ def cm_to_axes_rel(
     elif dim == "height":
         return float(fig_rel / ax_pos.height)
     else:
-        raise ValueError(f"Invalid dimension: {dim}")
+        # This should never be reached due to validation above
+        raise ValueError(f"Invalid dimension: {dim!r}")
 
 def get_default_colors() -> list[str]:
     """Return the default Matplotlib colors in hex or named format.
@@ -236,7 +266,16 @@ def adjust_axes_size(
 
     Returns:
         None
+    
+    Raises:
+        ValueError: If direction is not one of "left", "right", "bottom", "top".
     """
+    valid_directions = ["left", "right", "bottom", "top"]
+    if direction not in valid_directions:
+        raise ValueError(
+            f"Invalid direction: {direction!r}. Must be one of: {valid_directions!r}."
+        )
+    
     fig = ax.get_figure()
     if fig is None:
         raise ValueError("Axes must be attached to a figure")
@@ -283,7 +322,16 @@ def calculate_colorbar_position(
         
     Returns:
         Tuple of (x, y, width, height) in relative coordinates.
+    
+    Raises:
+        ValueError: If position is not one of "left", "right", "bottom", "top".
     """
+    valid_positions = ["left", "right", "bottom", "top"]
+    if position not in valid_positions:
+        raise ValueError(
+            f"Invalid position: {position!r}. Must be one of: {valid_positions!r}."
+        )
+    
     fig = ax.get_figure()
     if fig is None:
         raise ValueError("Axes must be attached to a figure")
@@ -324,4 +372,5 @@ def calculate_colorbar_position(
             width_rel
         )
     else:
-        raise ValueError(f"Invalid position: {position}")
+        # This should never be reached due to validation above
+        raise ValueError(f"Invalid position: {position!r}")

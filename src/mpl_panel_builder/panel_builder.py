@@ -233,14 +233,13 @@ class PanelBuilder:
 
         return axs
     
-    def draw_scale_bar(
+    def draw_x_scale_bar(
         self, 
         ax: MatplotlibAxes, 
         length: float, 
-        label: str, 
-        direction: Literal["x", "y"]
+        label: str
     ) -> None:
-        """Draws a scale bar for the given axes.
+        """Draws a horizontal scale bar for the given axes.
 
         The scale bar is drawn on a new axes covering the entire figure. This 
         makes it possible to draw the scale bar on inside or outside of the axes.
@@ -249,9 +248,7 @@ class PanelBuilder:
             ax: The axes to draw the scale bar for.
             length: The length of the scale bar in axes units.
             label: The label to display next to the scale bar.
-            direction: The direction of the scale bar ("x" or "y").
         """
-
         sep_cm = self.config.scalebar_config.separation_cm
         offset_cm = self.config.scalebar_config.offset_cm
         delta_text_cm = self.config.scalebar_config.text_offset_cm
@@ -260,58 +257,85 @@ class PanelBuilder:
         ax_bbox = ax.get_position()
         overlay_ax = mpl_helpers.create_full_figure_axes(self.fig)
 
-        if direction == "x":
-            sep_rel = mpl_helpers.cm_to_fig_rel(self.fig, sep_cm, "height")
-            offset_rel = mpl_helpers.cm_to_fig_rel(self.fig, offset_cm, "width")
-            delta_text_rel = mpl_helpers.cm_to_fig_rel(
-                self.fig, delta_text_cm, "height"
-            )
+        sep_rel = mpl_helpers.cm_to_fig_rel(self.fig, sep_cm, "height")
+        offset_rel = mpl_helpers.cm_to_fig_rel(self.fig, offset_cm, "width")
+        delta_text_rel = mpl_helpers.cm_to_fig_rel(
+            self.fig, delta_text_cm, "height"
+        )
 
-            ax_lim = ax.get_xlim()
-            length_rel = ax_bbox.width / (ax_lim[1] - ax_lim[0]) * length
+        ax_lim = ax.get_xlim()
+        length_rel = ax_bbox.width / (ax_lim[1] - ax_lim[0]) * length
 
-            x_rel = ax_bbox.x0 + offset_rel
-            y_rel = ax_bbox.y0 - sep_rel
+        x_rel = ax_bbox.x0 + offset_rel
+        y_rel = ax_bbox.y0 - sep_rel
 
-            overlay_ax.plot([x_rel, x_rel + length_rel], [y_rel, y_rel], "k-")
-            overlay_ax.text(
-                x_rel + length_rel / 2, 
-                y_rel - delta_text_rel, 
-                label, 
-                ha="center", 
-                va="top", 
-                fontsize=font_size_pt
-            )
-        
-        elif direction == "y":
-            sep_rel = mpl_helpers.cm_to_fig_rel(self.fig, sep_cm, "width")
-            offset_rel = mpl_helpers.cm_to_fig_rel(self.fig, offset_cm, "height")
-            delta_text_rel = mpl_helpers.cm_to_fig_rel(self.fig, delta_text_cm, "width")
-            # The ascender length is roughly 0.25 of the font size for the default font
-            # We therefore move the text this amount to make it appear to have the 
-            # same distance to the scale bar as the text for the x-direction.
-            font_offset_cm = mpl_helpers.pt_to_cm(font_size_pt) * 0.25
-            delta_text_rel -= mpl_helpers.cm_to_fig_rel(
-                self.fig, font_offset_cm, "width"
-            )
+        overlay_ax.plot(
+            [x_rel, x_rel + length_rel], [y_rel, y_rel], "k-", linewidth=1.0
+        )
+        overlay_ax.text(
+            x_rel + length_rel / 2, 
+            y_rel - delta_text_rel, 
+            label, 
+            ha="center", 
+            va="top", 
+            fontsize=font_size_pt
+        )
+    
+    def draw_y_scale_bar(
+        self, 
+        ax: MatplotlibAxes, 
+        length: float, 
+        label: str
+    ) -> None:
+        """Draws a vertical scale bar for the given axes.
 
-            # Get the length of the scale bar in relative coordinates   
-            ax_lim = ax.get_ylim()
-            length_rel = ax_bbox.height / (ax_lim[1] - ax_lim[0]) * length
+        The scale bar is drawn on a new axes covering the entire figure. This 
+        makes it possible to draw the scale bar on inside or outside of the axes.
 
-            x_rel = ax_bbox.x0 - sep_rel
-            y_rel = ax_bbox.y0 + offset_rel
+        Args:
+            ax: The axes to draw the scale bar for.
+            length: The length of the scale bar in axes units.
+            label: The label to display next to the scale bar.
+        """
+        sep_cm = self.config.scalebar_config.separation_cm
+        offset_cm = self.config.scalebar_config.offset_cm
+        delta_text_cm = self.config.scalebar_config.text_offset_cm
+        font_size_pt = self.config.font_sizes.axes_pt
 
-            overlay_ax.plot([x_rel, x_rel], [y_rel, y_rel + length_rel], "k-")
-            overlay_ax.text(
-                x_rel - delta_text_rel, 
-                y_rel + length_rel / 2, 
-                label, 
-                ha="right", 
-                va="center", 
-                rotation=90, 
-                fontsize=font_size_pt
-            )
+        ax_bbox = ax.get_position()
+        overlay_ax = mpl_helpers.create_full_figure_axes(self.fig)
+
+        sep_rel = mpl_helpers.cm_to_fig_rel(self.fig, sep_cm, "width")
+        offset_rel = mpl_helpers.cm_to_fig_rel(self.fig, offset_cm, "height")
+        delta_text_rel = mpl_helpers.cm_to_fig_rel(self.fig, delta_text_cm, "width")
+        # The ascender length is roughly 0.25 of the font size for the default font
+        # We therefore move the text this amount to make it appear to have the 
+        # same distance to the scale bar as the text for the x-direction.
+        font_offset_cm = mpl_helpers.pt_to_cm(font_size_pt) * 0.25
+        delta_text_rel -= mpl_helpers.cm_to_fig_rel(
+            self.fig, font_offset_cm, "width"
+        )
+
+        # Get the length of the scale bar in relative coordinates   
+        ax_lim = ax.get_ylim()
+        length_rel = ax_bbox.height / (ax_lim[1] - ax_lim[0]) * length
+
+        x_rel = ax_bbox.x0 - sep_rel
+        y_rel = ax_bbox.y0 + offset_rel
+
+        overlay_ax.plot(
+            [x_rel, x_rel], [y_rel, y_rel + length_rel], "k-", linewidth=1.0
+        )
+        overlay_ax.text(
+            x_rel - delta_text_rel, 
+            y_rel + length_rel / 2, 
+            label, 
+            ha="right", 
+            va="center", 
+            rotation=90, 
+            fontsize=font_size_pt
+        )
+    
     
     def add_colorbar(
         self, 
@@ -335,7 +359,16 @@ class PanelBuilder:
 
         Returns:
             The created colorbar object.
+
+        Raises:
+            ValueError: If position is not one of "left", "right", "bottom", "top".
         """
+        valid_positions = ["left", "right", "bottom", "top"]
+        if position not in valid_positions:
+            raise ValueError(
+                f"Invalid position: {position!r}. Must be one of: {valid_positions!r}."
+            )
+        
         colorbar_config = self.config.colorbar_config
         
         if shrink_axes:
