@@ -1,12 +1,24 @@
-# mpl-panel-builder
+<p align="center">
+    <img src="images/mpl-panel-builder-logo.png" alt="mpl-pnael-builder logo" width="256px" >   
+</p>
 
-![Python](https://img.shields.io/badge/python-3.11%2B-blue)
+<h2 align="center"> Create publication-quality scientific figure panels with a consistent layout</h2>
+
+<div align="center">
+
 [![Pre-commit](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/pre-commit.yml)
 [![tests](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/tests.yml/badge.svg)](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/tests.yml)
-![Ruff](https://img.shields.io/badge/linter-ruff-0098db)
+
+![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
+</div>
+
+<div align="center">
+
 `mpl-panel-builder` helps you compose matplotlib-based publication-quality scientific figure panels with precise and repeatable layouts. The shared precise layout lets you align panels perfectly into complete figures by simply stacking them vertically or horizontally. Included example scripts emphasize both how to create panels and how these can be combined with TikZ to obtain a complete figure creation pipeline that is fully reproducible and under version control in Git. 
+
+</div>
 
 ## Features
 
