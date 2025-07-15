@@ -11,6 +11,7 @@
 [![Unit Tests](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/tests.yml/badge.svg)](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/tests.yml)
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
+[![PyPI version](https://badge.fury.io/py/mpl-panel-builder.svg)](https://badge.fury.io/py/mpl-panel-builder)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 </div>

@@ -1,4 +1,4 @@
-"""Feature rendering (scale bars, colorbars, descriptions)."""
+"""Feature rendering (scale bars, colorbars, annotations)."""
 
 from typing import Literal
 
@@ -210,7 +210,7 @@ class FeatureManager:
         color: tuple[float, float, float] | str = (0, 0, 0),
         bg_color: tuple[float, float, float] | str = "none",
     ) -> None:
-        """Add a annotation text inside the axes at a specified corner location.
+        """Add an annotation text inside the axes at a specified corner location.
 
         Args:
             ax: The matplotlib Axes object to annotate.
@@ -228,7 +228,7 @@ class FeatureManager:
             ValueError: If `loc` is not one of the allowed position keywords.
         """
         font_size_pt = self.config.font_sizes.text_pt
-        margin_cm = self.config.description_config.margin_cm
+        margin_cm = self.config.annotation_config.margin_cm
         delta_x = mpl_helpers.cm_to_axes_rel(ax, margin_cm, "width")
         delta_y = mpl_helpers.cm_to_axes_rel(ax, margin_cm, "height")
 

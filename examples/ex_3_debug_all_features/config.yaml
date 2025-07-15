@@ -25,7 +25,7 @@ figures:
   colorbar_config: 
     width_cm: 0.5
     separation_cm: 0.5
-  description_config: 
+  annotation_config: 
     margin_cm: 0.5
   panel_output: 
     directory: "output"

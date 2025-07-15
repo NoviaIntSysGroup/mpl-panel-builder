@@ -30,7 +30,7 @@ class PanelConfig(FrozenConfigBase):
         line_style: Line and marker styling configuration.
         scalebar_config: Scale bar configuration.
         colorbar_config: Color bar configuration.
-        description_config: Description text configuration.
+        annotation_config: Annotation text configuration.
         debug_panel: Debug panel configuration.
         panel_output: Output configuration for panels.
     """
@@ -58,9 +58,9 @@ class PanelConfig(FrozenConfigBase):
         default_factory=ColorBar,
         metadata={"description": "Color bar configuration"},
     )
-    description_config: TextAnnotation = field(
+    annotation_config: TextAnnotation = field(
         default_factory=TextAnnotation,
-        metadata={"description": "Description text configuration"},
+        metadata={"description": "Annotation text configuration"},
     )
     debug_panel: DebugPanel = field(
         default_factory=DebugPanel,
