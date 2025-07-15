@@ -8,14 +8,14 @@ resulting PDF to a high-resolution PNG for documentation purposes.
 import os
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 
-# Add the project root to sys.path to allow importing helpers module
-sys.path.append(str(Path(__file__).parent.parent.parent.absolute()))
-from examples.helpers import get_logger, get_project_root
+from mpl_panel_builder.helpers import get_logger, setup_output_dir
 
-logger = get_logger(__name__)
+# Simple setup
+example_name = Path(__file__).parent.name
+output_dir = setup_output_dir(example_name)
+logger = get_logger(example_name)
 
 def check_dependencies() -> None:
     """Check if required external dependencies are installed.
@@ -41,38 +41,30 @@ def check_dependencies() -> None:
         )
 
 
-def run_command(cmd: list[str], cwd: Path | None = None) -> None:
+def run_command(
+    cmd: list[str], cwd: Path | None = None, capture_output: bool = False
+) -> None:
     """Run a shell command and raise an exception if it fails.
 
     Args:
         cmd: List of command and arguments to run.
         cwd: Working directory to run the command in.
+        capture_output: Whether to capture output (hide it) or let it stream to console.
     """
-    result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"Command failed: {' '.join(cmd)}\n"
-            f"Error: {result.stderr}"
-        )
-
-
-def to_unix_path(path: Path) -> str:
-    """Convert a Windows path to Unix-style path format.
-
-    Args:
-        path: Path to convert.
-
-    Returns:
-        Unix-style path string.
-    """
-    # Convert to absolute path and normalize
-    abs_path = str(path.absolute())
-    # Replace backslashes with forward slashes
-    unix_path = abs_path.replace("\\", "/")
-    # Convert drive letter format (e.g., C: to /c/)
-    if unix_path[1] == ":":
-        unix_path = f"/{unix_path[0].lower()}/{unix_path[3:]}"
-    return unix_path
+    # Ensure we inherit the system PATH so external tools are accessible
+    env = os.environ.copy()
+    
+    if capture_output:
+        result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, env=env)
+        if result.returncode != 0:
+            raise RuntimeError(
+                f"Command failed: {' '.join(cmd)}\n"
+                f"Error: {result.stderr}"
+            )
+    else:
+        result = subprocess.run(cmd, cwd=cwd, env=env)
+        if result.returncode != 0:
+            raise RuntimeError(f"Command failed: {' '.join(cmd)}")
 
 
 def main() -> None:
@@ -80,16 +72,15 @@ def main() -> None:
     # Check for required dependencies
     check_dependencies()
     
-    # Get the project root directory and current example directory
-    project_root = get_project_root()
+    # Get the current example directory and outputs
     current_dir = Path(__file__).parent
-    example_name = current_dir.name
-    outputs_dir = project_root / "outputs" / example_name
+    outputs_dir = output_dir
 
     # Run the example script
     logger.info("Running example script...")
+    panels_script = current_dir / "create_panels.py"
     run_command(
-        ["python", str(current_dir / "create_panels.py")],
+        ["uv", "run", "python", str(panels_script)],
         cwd=current_dir
     )
 
@@ -101,7 +92,8 @@ def main() -> None:
             "-interaction=nonstopmode",
             "figure.tex"
         ],
-        cwd=current_dir
+        cwd=current_dir,
+        capture_output=True
     )
 
     # Move the PDF to outputs directory
@@ -129,7 +121,8 @@ def main() -> None:
                 "-r", "600",
                 str(pdf_dest),
                 str(png_output.with_suffix(""))
-            ]
+            ],
+            capture_output=True
         )
         # Rename the file to remove the -1 suffix
         png_generated = Path(f"{png_output.with_suffix('')}-1.png")
@@ -145,4 +138,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main() 
+    main()

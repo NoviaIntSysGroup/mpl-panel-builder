@@ -116,19 +116,36 @@ fig = panel()  # This creates and returns the figure panel
 
 ### Configuration Documentation
 
-To explore all available configuration options, use the built-in documentation feature:
+To explore all available configuration options, use the built-in documentation feature that provides a hierarchical overview of all configuration options, including required and optional fields with their descriptions, types, and default values.
 
 ```python
 from mpl_panel_builder.panel_builder_config import PanelBuilderConfig
 
 # Display all configuration keys with descriptions
 print(PanelBuilderConfig.describe_config())
-
-# Minimal output (no types or defaults)
-print(PanelBuilderConfig.describe_config(show_types=False, show_defaults=False))
 ```
 
-This provides a hierarchical overview of all configuration options, including required and optional fields with their descriptions, types, and default values.
+### Configuration Templates
+
+For easier configuration management, you can generate YAML template files:
+
+```python
+from mpl_panel_builder.panel_builder_config import PanelBuilderConfig
+
+# Generate a complete template with all options
+PanelBuilderConfig.save_template_config("my_config.yaml")
+```
+
+Load the template after editing:
+
+```python
+import yaml
+
+with open("my_config.yaml") as f:
+    config_dict = yaml.safe_load(f)["panel_config"]
+    
+config = PanelBuilderConfig.from_dict(config_dict)
+```
 
 ## Examples
 

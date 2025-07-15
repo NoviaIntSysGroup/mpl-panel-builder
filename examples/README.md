@@ -56,7 +56,7 @@ outputs/
 
 To use an example:
 1. Navigate to the example directory.
-1. Run `create_panels.py` to generate the figure panels.
-1. Run `create_figure.py` to generate the complete figure.
+1. Run `uv run python create_panels.py` to generate the figure panels.
+1. Run `uv run python create_figure.py` to generate the complete figure.
 
 Each example demonstrates different aspects of the package's capabilities, from basic panel creation to complex multi-panel figures. 

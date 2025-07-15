@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from mpl_panel_builder.mpl_helpers import (
+from mpl_panel_builder.helpers.mpl import (
     cm_to_inches,
     cm_to_pt,
     get_default_colors,

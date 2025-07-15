@@ -6,21 +6,16 @@ The script defines the following subclass of :class:`PanelBuilder`:
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from typing import Any
 
-# Add the project root to sys.path to allow importing helpers module
-sys.path.append(str(Path(__file__).parent.parent.parent.absolute()))
-from examples.helpers import get_logger, get_project_root
-from mpl_panel_builder.panel_builder import PanelBuilder
+from mpl_panel_builder import PanelBuilder
+from mpl_panel_builder.helpers import get_logger, setup_output_dir
 
-logger = get_logger(__name__)
-
-# Define panel configuration
-project_root = get_project_root()
-current_dir = Path(__file__).parent
-example_name = current_dir.name
+# Simple setup
+example_name = Path(__file__).parent.name
+output_dir = setup_output_dir(example_name)
+logger = get_logger(example_name)
 
 # 1. Define the configuration
 config: dict[str, Any] = {
@@ -43,13 +38,13 @@ config: dict[str, Any] = {
     },
     # Optional keys (with default values)
     "panel_output": {
-        "directory": project_root / "outputs" / example_name / "panels",
+        "directory": str(output_dir / "panels"),
         "format": "pdf",
     },
 }
 
 # Create output directory if it doesn't exist
-config["panel_output"]["directory"].mkdir(parents=True, exist_ok=True)
+(output_dir / "panels").mkdir(parents=True, exist_ok=True)
 
 # 2. Create a panel subclass
 class MyPanel(PanelBuilder):

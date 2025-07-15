@@ -8,26 +8,27 @@ The script defines the following subclasses of :class:`PanelBuilder`:
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 from matplotlib.axes import Axes
 
-# Add the project root to sys.path to allow importing helpers module
-sys.path.append(str(Path(__file__).parent.parent.parent.absolute()))
-from examples.helpers import get_logger, get_project_root
-from mpl_panel_builder.mpl_helpers import cm_to_fig_rel, create_full_figure_axes
-from mpl_panel_builder.panel_builder import PanelBuilder
+from mpl_panel_builder import PanelBuilder
+from mpl_panel_builder.helpers import (
+    cm_to_fig_rel,
+    create_full_figure_axes,
+    get_logger,
+    setup_output_dir,
+)
 
-logger = get_logger(__name__)
+# Simple setup
+example_name = Path(__file__).parent.name
+output_dir = setup_output_dir(example_name)
+logger = get_logger(example_name)
 
 # Define panel configuration
 margin = 1
-project_root = get_project_root()
-current_dir = Path(__file__).parent
-example_name = current_dir.name
 config: dict[str, Any] = {
     # Required keys (no default values)
     "panel_dimensions": {"width_cm": 6.0, "height_cm": 5.0},
@@ -40,7 +41,7 @@ config: dict[str, Any] = {
     "font_sizes": {"axes_pt": 8, "text_pt": 6},
     # Optional keys (with default values)
     "panel_output": {
-        "directory": project_root / "outputs" / example_name / "panels",
+        "directory": str(output_dir / "panels"),
         "format": "pdf",
     },
     # Custom keys that are not part of the PanelBuilder class
@@ -49,7 +50,7 @@ config: dict[str, Any] = {
 }
 
 # Create output directory if it doesn't exist
-config["panel_output"]["directory"].mkdir(parents=True, exist_ok=True)
+(output_dir / "panels").mkdir(parents=True, exist_ok=True)
 
 # Example specific helper functions
 def _plot_sinusoid(ax: Axes, style: str = "b-") -> None:

@@ -11,7 +11,6 @@ The script defines the following subclass of :class:`PanelBuilder`:
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from typing import Literal
 
@@ -20,27 +19,27 @@ import yaml
 from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 
-# Add the project root to sys.path to allow importing helpers module
-sys.path.append(str(Path(__file__).parent.parent.parent.absolute()))
-from examples.helpers import get_logger, get_project_root
-from mpl_panel_builder.mpl_helpers import adjust_axes_size
-from mpl_panel_builder.panel_builder import PanelBuilder
+from mpl_panel_builder import PanelBuilder
+from mpl_panel_builder.helpers import (
+    adjust_axes_size,
+    get_logger,
+    setup_output_dir,
+)
 
-logger = get_logger(__name__)
-
-# Define panel configuration
-project_root = get_project_root()
+# Simple setup
+example_name = Path(__file__).parent.name
+output_dir = setup_output_dir(example_name)
+logger = get_logger(example_name)
 current_dir = Path(__file__).parent
-example_name = current_dir.name
 
 # Load the configuration
 with open(current_dir / "config.yaml") as file:
     config = yaml.safe_load(file)["figures"]
 
 # Correct the panel output directory
-config["panel_output"]["directory"] = project_root / "outputs" / example_name / "panels"
+config["panel_output"]["directory"] = str(output_dir / "panels")
 # Create the output directory if it doesn't exist
-config["panel_output"]["directory"].mkdir(parents=True, exist_ok=True)
+(output_dir / "panels").mkdir(parents=True, exist_ok=True)
 
 
 def _get_xy_data() -> tuple[np.ndarray, np.ndarray]:
@@ -100,11 +99,11 @@ class DebugPanel(PanelBuilder):
         )
         # Test y scale bar
         self.draw_y_scale_bar(ax, 1, "1 cm")
-        # Test description
-        self.draw_description(ax, "NW", loc="northwest", bg_color="lightgrey")
-        self.draw_description(ax, "NE", loc="northeast", bg_color="lightgrey")
-        self.draw_description(ax, "SW", loc="southwest", bg_color="lightgrey")
-        self.draw_description(ax, "SE", loc="southeast", bg_color="lightgrey")
+        # Test annotation
+        self.add_annotation(ax, "NW", loc="northwest", bg_color="lightgrey")
+        self.add_annotation(ax, "NE", loc="northeast", bg_color="lightgrey")
+        self.add_annotation(ax, "SW", loc="southwest", bg_color="lightgrey")
+        self.add_annotation(ax, "SE", loc="southeast", bg_color="lightgrey")
 
         # Top right
         ax = self.axs[0][1]

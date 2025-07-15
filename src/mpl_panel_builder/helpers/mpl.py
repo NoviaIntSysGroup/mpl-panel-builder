@@ -1,4 +1,9 @@
-"""Helper functions for matplotlib."""
+"""Matplotlib-specific utility functions.
+
+This module contains low-level utilities for working with matplotlib
+figures, axes, and coordinate transformations. These are primarily
+used internally by the PanelBuilder system.
+"""
 
 from typing import Literal, cast
 
