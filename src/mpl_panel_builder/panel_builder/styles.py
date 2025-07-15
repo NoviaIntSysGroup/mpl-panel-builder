@@ -35,7 +35,7 @@ class StyleManager:
             "figure.facecolor": "white",
 
             # Axes appearance
-            "axes.facecolor": "none",
+            "axes.facecolor": "white",
             "axes.spines.right": False,
             "axes.spines.top": False,
             "axes.titlepad": 4,
@@ -56,7 +56,7 @@ class StyleManager:
             # Legend appearance
             "legend.frameon": True,
             "legend.framealpha": 0.6,
-            "legend.edgecolor": (1, 1, 1, 0.5),
+            "legend.edgecolor": "none",
             "legend.handlelength": 1.0,
             "legend.handletextpad": 0.7,
             "legend.labelspacing": 0.4,
