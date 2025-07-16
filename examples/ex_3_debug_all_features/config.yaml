@@ -9,8 +9,9 @@ figures:
     right_cm: 0.5
     top_cm: 0.5
   style:
-    theme: default
+    theme: white
     rc_params:
+      # Font sizes
       axes.titlesize: 8
       axes.labelsize: 8
       xtick.labelsize: 8
@@ -18,8 +19,11 @@ figures:
       figure.titlesize: 8
       font.size: 6
       legend.fontsize: 6
+      # Line and marker styles
       lines.linewidth: 3.0
       lines.markersize: 4.0
+      # Axes properties (makes the debug lines visible)
+      axes.facecolor: none
   # Optional fields
   axes_separation: 
     x_cm: 1.0

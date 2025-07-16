@@ -11,13 +11,13 @@ class StyleConfig(FrozenConfigBase):
     """Matplotlib styling configuration with theme support.
 
     Attributes:
-        theme: Theme name for predefined style templates ('default' or 'none').
+        theme: Theme name for predefined style templates ('white' or 'none').
         rc_params: Custom rcParams that override theme defaults.
     """
 
     theme: str = field(
-        default="default",
-        metadata={"description": "Theme name: 'default' or 'none'"}
+        default="none",
+        metadata={"description": "Theme name: 'white' or 'none'"}
     )
     rc_params: dict[str, Any] = field(
         default_factory=dict,
@@ -28,7 +28,7 @@ class StyleConfig(FrozenConfigBase):
         """Post-initialization checks for style configuration.
 
         Raises:
-            ValueError: If theme is not 'default' or 'none'.
+            ValueError: If theme is not 'white' or 'none'.
         """
-        if self.theme not in ["default", "none"]:
-            raise ValueError("Theme must be 'default' or 'none'")
+        if self.theme not in ["white", "none"]:
+            raise ValueError("Theme must be 'white' or 'none'")

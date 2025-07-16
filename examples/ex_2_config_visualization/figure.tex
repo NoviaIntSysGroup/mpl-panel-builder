@@ -15,7 +15,7 @@
 \node[panel, anchor=west](c) at (b.east) {\includegraphics[]{"../../outputs/\exampleName/panels/font_size_panel"}};
 
 % Keys
-\foreach \n/\t in {a/panel\_dimensions\_cm, b/panel\_margins\_cm, c/font\_sizes\_pt} {
+\foreach \n/\t in {a/panel\_dimensions, b/panel\_margins, c/rc\_params} {
     \node[headingNode, anchor=south, yshift=0] at (\n.north) {\headingSize\t};
 }
 

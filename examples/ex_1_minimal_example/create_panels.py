@@ -19,7 +19,7 @@ logger = get_logger(example_name)
 
 # 1. Define the configuration
 config: dict[str, Any] = {
-    # Panel dimensions in centimeters
+    # Panel dimensions
     "panel_dimensions": {
         "width_cm": 6.0,
         "height_cm": 5.0,
@@ -31,10 +31,12 @@ config: dict[str, Any] = {
         "left_cm": 1.5,
         "right_cm": 0.5,
     },
-    # Font sizes in points
-    "font_sizes": {
-        "axes_pt": 8,      # font size for axis labels and ticks
-        "text_pt": 6,      # font size for other text elements
+    # Styling via rcParams
+    "style": {
+        "rc_params": { 
+            "font.size": 8,
+            "legend.fontsize": 6,
+        }
     },
     # Optional keys (with default values)
     "panel_output": {

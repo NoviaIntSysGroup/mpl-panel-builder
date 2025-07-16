@@ -118,7 +118,7 @@ def main() -> None:
             [
                 "pdftoppm",
                 "-png",
-                "-r", "600",
+                "-r", "300",
                 str(pdf_dest),
                 str(png_output.with_suffix(""))
             ],

@@ -50,16 +50,16 @@ uv run pre-commit install --hook-type pre-commit --hook-type pre-push
 
 - **`PanelBuilder`** (`src/mpl_panel_builder/panel_builder.py`): Abstract base class for creating panels. Subclasses must define `_panel_name`, `_n_rows`, `_n_cols` class attributes and implement `build_panel()` method.
 
-- **`PanelBuilderConfig`** (`src/mpl_panel_builder/panel_builder_config.py`): Immutable configuration system using frozen dataclasses with dot-access. Supports nested configurations and custom fields through `_extra` attribute.
+- **`PanelConfig`** (`src/mpl_panel_builder/panel_config/config.py`): Immutable configuration system using frozen dataclasses with dot-access. Supports nested configurations and custom fields through `_extra` attribute.
 
 - **Configuration System**: Uses frozen dataclasses for type-safe, immutable configuration with automatic validation. Supports relative updates (e.g., "+=0.5", "*1.2") via `override_config()` function.
 
 ### Panel Creation Pattern
 
 1. Define configuration dictionary with required keys:
-   - `panel_dimensions_cm`: Panel size in centimeters
-   - `panel_margins_cm`: Margins around plot area  
-   - `font_sizes_pt`: Font sizes for axes and text
+   - `panel_dimensions`: Panel size in centimeters
+   - `panel_margins`: Margins around plot area  
+   - `style`: Styling configuration with theme support and matplotlib rcParams
 
 2. Subclass `PanelBuilder` with required class attributes:
    - `_panel_name`: Unique panel identifier
@@ -69,10 +69,25 @@ uv run pre-commit install --hook-type pre-commit --hook-type pre-push
 
 4. Instantiate and call panel class to generate figure
 
+### Styling Architecture
+
+The styling system is built around themes and rcParams:
+
+- **`StyleConfig`** (`src/mpl_panel_builder/panel_config/types/styles.py`): Configuration dataclass containing `theme` (str) and `rc_params` (dict) fields.
+
+- **`StyleManager`** (`src/mpl_panel_builder/panel_builder/styles.py`): Manages theme-based styling with:
+  - Theme registry with `WhiteTheme` and `NoneTheme` 
+  - Theme merging logic where user rcParams override theme defaults
+  - `get_style_rc()` method returns final rcParams for matplotlib
+
+- **Font Size Extraction**: Features module extracts font sizes dynamically from axes objects:
+  - Scale bars use `ax.xaxis.label.get_fontsize()` / `ax.yaxis.label.get_fontsize()`
+  - Text annotations use `plt.rcParams['font.size']`
+
 ### Key Features
 
 - **Precise Layout**: All dimensions specified in centimeters for exact sizing
-- **Style Management**: Consistent matplotlib rcParams applied via context manager
+- **Theme-based Style Management**: Flexible styling system with predefined themes ('white', 'none') and full matplotlib rcParams support. User rcParams override theme defaults.
 - **Scale Bars**: Built-in support for scale bars with `draw_scale_bar()` method
 - **Debug Mode**: Grid overlay for layout debugging via `debug_panel.show` config
 - **Flexible Output**: Configurable output directory, format, and DPI

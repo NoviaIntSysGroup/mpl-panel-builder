@@ -19,9 +19,9 @@ class StyleTheme(Protocol):
 
 
 class WhiteTheme:
-    """Default theme."""
+    """White theme - clean scientific publication styling."""
     
-    name = "default"
+    name = "white"
     
     def get_rcparams(self) -> dict[str, Any]:
         """Get default theme rcParams."""
@@ -73,7 +73,7 @@ class StyleManager:
     """Enhanced style manager with theme support."""
     
     _themes: ClassVar[dict[str, StyleTheme]] = {
-        "default": WhiteTheme(),
+        "white": WhiteTheme(),
         "none": NoneTheme()
     }
 
@@ -94,7 +94,7 @@ class StyleManager:
         Returns:
             Dict[str, Any]: A style dictionary for matplotlib.rc_context.
         """
-        theme = self._themes[self.config.style.theme]
+        theme = self._themes.get(self.config.style.theme, self._themes["none"])
         base_params = theme.get_rcparams()
         user_params = self.config.style.rc_params
         return {**base_params, **user_params}  # User overrides theme

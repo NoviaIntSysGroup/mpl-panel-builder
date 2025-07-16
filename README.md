@@ -18,7 +18,7 @@
 
 <div align="center">
 
-`mpl-panel-builder` helps you compose matplotlib-based publication-quality scientific figure panels with precise and repeatable layouts. The shared precise layout lets you align panels perfectly into complete figures by simply stacking them vertically or horizontally. Included example scripts emphasize both how to create panels and how these can be combined with TikZ to obtain a complete figure creation pipeline that is fully reproducible and under version control in Git. 
+`mpl-panel-builder` helps you compose matplotlib-based publication-quality scientific figure panels with precise and repeatable layouts. The shared precise layout lets you align panels perfectly into complete figures by simply stacking them vertically or horizontally. Included example scripts illustrate how to create panels and how these can be combined with TikZ to obtain a complete figure creation pipeline that is fully reproducible and under version control in Git. 
 
 </div>
 
@@ -61,16 +61,16 @@ $ cd mpl-panel-builder
 $ uv sync
 ```
 
-## Usage
+## Basic usage
 
-Panels are created by subclassing `PanelBuilder`, and by defining their size, margins and font sizes. A minimal example is given below:
+Panels are created by subclassing `PanelBuilder`, and by defining their size and margins. Font sizes and styles can be adjusted via rcParams. A minimal example is given below:
 
 ```python
 from mpl_panel_builder.panel_builder import PanelBuilder
 
 # 1. Define the configuration
 config = {
-    # Panel dimensions in centimeters
+    # Panel dimensions
     "panel_dimensions": {
         "width_cm": 6.0,
         "height_cm": 5.0,
@@ -82,10 +82,11 @@ config = {
         "left_cm": 1.5,
         "right_cm": 0.5,
     },
-    # Font sizes in points
-    "font_sizes": {
-        "axes_pt": 8,
-        "text_pt": 6,
+    # Styling via rcParams
+    "style": {
+        "rc_params": {
+            "font.size": 8,
+        }
     }
 }
 
@@ -120,24 +121,24 @@ fig = panel()  # This creates and returns the figure panel
 To explore all available configuration options, use the built-in documentation feature that provides a hierarchical overview of all configuration options, including required and optional fields with their descriptions, types, and default values.
 
 ```python
-from mpl_panel_builder.panel_builder_config import PanelBuilderConfig
+from mpl_panel_builder.panel_config import PanelConfig
 
 # Display all configuration keys with descriptions
-print(PanelBuilderConfig.describe_config())
+print(PanelConfig.describe_config())
 ```
 
 ### Configuration Templates
 
-For easier configuration management, you can generate YAML template files:
+You can also generate a template YAML config file to get started:
 
 ```python
-from mpl_panel_builder.panel_builder_config import PanelBuilderConfig
+from mpl_panel_builder.panel_config import PanelConfig
 
 # Generate a complete template with all options
-PanelBuilderConfig.save_template_config("my_config.yaml")
+PanelConfig.save_template_config("my_config.yaml")
 ```
 
-Load the template after editing:
+and then use it after editing:
 
 ```python
 import yaml
@@ -145,7 +146,7 @@ import yaml
 with open("my_config.yaml") as f:
     config_dict = yaml.safe_load(f)["panel_config"]
     
-config = PanelBuilderConfig.from_dict(config_dict)
+config = PanelConfig.from_dict(config_dict)
 ```
 
 ## Examples
@@ -156,16 +157,16 @@ The repository includes example scripts that demonstrate both panel creation and
 
 ```bash
 # Create panels only
-python examples/ex_1_minimal_example/create_panels.py
+uv run python examples/ex_1_minimal_example/create_panels.py
 ```
 
 ### Example 2: Config key visualization
 
 ```bash
 # Create panels only
-python examples/ex_2_config_visualization/create_panels.py
+uv run python examples/ex_2_config_visualization/create_panels.py
 # Create complete figure, requires TikZ and Poppler
-python examples/ex_2_config_visualization/create_figure.py
+uv run python examples/ex_2_config_visualization/create_figure.py
 ```
 
 <img src="outputs/ex_2_config_visualization/figure.png" style="max-width: 500px; width: 100%; height: auto;" />  

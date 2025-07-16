@@ -26,7 +26,7 @@ def sample_config_dict(tmp_path: Path) -> ConfigDict:
             "right_cm": 1.0
         },
         "style": {
-            "theme": "default",
+            "theme": "white",
             "rc_params": {
                 "axes.titlesize": 12.0,
                 "axes.labelsize": 12.0,

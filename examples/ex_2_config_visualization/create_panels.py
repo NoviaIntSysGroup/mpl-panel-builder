@@ -39,15 +39,13 @@ config: dict[str, Any] = {
         "bottom_cm": margin,
     },
     "style": {
-        "theme": "default",
         "rc_params": {
+            "font.size": 8,
             "axes.titlesize": 8,
             "axes.labelsize": 8,
             "xtick.labelsize": 8,
             "ytick.labelsize": 8,
-            "figure.titlesize": 8,
-            "font.size": 6,
-            "legend.fontsize": 6,
+            "legend.fontsize": 8,
         }
     },
     # Optional keys (with default values)
@@ -73,7 +71,7 @@ def _plot_sinusoid(ax: Axes, style: str = "b-") -> None:
 
     x = np.linspace(0, 5 * np.pi, 100)
     y = np.sin(x)
-    ax.plot(x, y, style, label="text")
+    ax.plot(x, y, style, label="legend.fontsize")
     ax.set(xticks=[], yticks=[])
     for spine in ax.spines.values():
         spine.set_visible(True)
@@ -89,7 +87,8 @@ class DimPanelDemo(PanelBuilder):
     def build_panel(self) -> None:
         """Create custom content for the panel."""
 
-        _plot_sinusoid(self.axs[0][0], self.config.plot_styles.data)
+        ax = self.axs[0][0]
+        _plot_sinusoid(ax, self.config.plot_styles.data)
 
         delta = 0.005  # Small delta to avoid overlap with panel border
         ax_panel = create_full_figure_axes(self.fig)
@@ -101,10 +100,10 @@ class DimPanelDemo(PanelBuilder):
         shared_text_args: dict[str, Any] = {
             "ha": "center",
             "va": "center",
-            "fontsize": self.ax.xaxis.label.get_fontsize(),
+            "fontsize": ax.xaxis.label.get_fontsize(),
         }
-        self.fig.text(0.5, padding_rel_y, "width", **shared_text_args)
-        self.fig.text(padding_rel_x, 0.5, "height", rotation=90, **shared_text_args)
+        self.fig.text(0.5, padding_rel_y, "width_cm", **shared_text_args)
+        self.fig.text(padding_rel_x, 0.5, "height_cm", rotation=90, **shared_text_args)
 
 
 class MarginPanelDemo(PanelBuilder):
@@ -117,7 +116,8 @@ class MarginPanelDemo(PanelBuilder):
     def build_panel(self) -> None:
         """Create custom content for the panel."""
 
-        _plot_sinusoid(self.axs[0][0])
+        ax = self.axs[0][0]
+        _plot_sinusoid(ax)
 
         margins_cm = self.config.panel_margins
         dims_cm = self.config.panel_dimensions
@@ -135,15 +135,15 @@ class MarginPanelDemo(PanelBuilder):
         shared_text_args: dict[str, Any] = {
             "ha": "center",
             "va": "center",
-            "fontsize": self.ax.xaxis.label.get_fontsize(),
+            "fontsize": ax.xaxis.label.get_fontsize(),
         }
-        self.fig.text(0.5, bottom_margin / 2, "bottom", **shared_text_args)
-        self.fig.text(0.5, 1 - top_margin / 2, "top", **shared_text_args)
-        self.fig.text(left_margin / 2, 0.5, "left", rotation=90, **shared_text_args)
+        self.fig.text(0.5, bottom_margin / 2, "bottom_cm", **shared_text_args)
+        self.fig.text(0.5, 1 - top_margin / 2, "top_cm", **shared_text_args)
+        self.fig.text(left_margin / 2, 0.5, "left_cm", rotation=90, **shared_text_args)
         self.fig.text(
             1 - right_margin / 2,
             0.5,
-            "right",
+            "right_cm",
             rotation=90,
             **shared_text_args,
         )
@@ -159,15 +159,14 @@ class FontSizePanelDemo(PanelBuilder):
     def build_panel(self) -> None:
         """Create custom content for the panel."""
 
-        _plot_sinusoid(self.axs[0][0])
-        self.axs[0][0].set(
-            xlabel="axes",
-            ylabel="axes",
-            title="axes",
+        ax = self.axs[0][0]
+        _plot_sinusoid(ax)
+        ax.set(
+            xlabel="axes.labelsize",
+            ylabel="axes.labelsize",
+            title="figure.titlesize",
         )
-        self.axs[0][0].legend(loc="lower right")
-        sample_text = "text\ntext\ntext\ntext"
-        self.axs[0][0].text(0.1, -0.9, sample_text, va="bottom", ha="left")
+        ax.legend(loc="lower right")
 
 
 if __name__ == "__main__":
