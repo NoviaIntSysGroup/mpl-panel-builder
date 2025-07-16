@@ -90,7 +90,7 @@ class PanelBuilder:
         Returns:
             MatplotlibFigure: The constructed matplotlib figure.
         """
-        style_context = self._style_manager.get_default_style_rc()
+        style_context = self._style_manager.get_style_rc()
         with plt.rc_context(rc=style_context):
             self._fig = self._figure_manager.create_fig()
             self._figure_manager.draw_debug_lines(self._fig)

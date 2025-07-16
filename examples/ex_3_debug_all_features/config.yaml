@@ -8,16 +8,22 @@ figures:
     bottom_cm: 1.5
     right_cm: 0.5
     top_cm: 0.5
-  font_sizes: 
-    axes_pt: 8
-    text_pt: 6
+  style:
+    theme: default
+    rc_params:
+      axes.titlesize: 8
+      axes.labelsize: 8
+      xtick.labelsize: 8
+      ytick.labelsize: 8
+      figure.titlesize: 8
+      font.size: 6
+      legend.fontsize: 6
+      lines.linewidth: 3.0
+      lines.markersize: 4.0
   # Optional fields
   axes_separation: 
     x_cm: 1.0
     y_cm: 1.0
-  line_style:
-    line_width_pt: 3.0
-    marker_size_pt: 4.0
   scalebar_config: 
     separation_cm: 0.5
     offset_cm: 0.5

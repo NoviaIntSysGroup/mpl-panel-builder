@@ -18,8 +18,8 @@ def test_arithmetic_operations(sample_config_dict: ConfigDict) -> None:
     Returns:
         None
     """
-    # Get first three different sections for testing
-    sections = list(sample_config_dict.keys())[:3]
+    # Get first three different sections for testing (excluding style with dict values)
+    sections = [k for k in sample_config_dict.keys() if k != "style"][:3]
     first_section = sections[0]
     second_section = sections[1]
     third_section = sections[2]

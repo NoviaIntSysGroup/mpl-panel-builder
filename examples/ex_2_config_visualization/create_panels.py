@@ -38,7 +38,18 @@ config: dict[str, Any] = {
         "top_cm": margin,
         "bottom_cm": margin,
     },
-    "font_sizes": {"axes_pt": 8, "text_pt": 6},
+    "style": {
+        "theme": "default",
+        "rc_params": {
+            "axes.titlesize": 8,
+            "axes.labelsize": 8,
+            "xtick.labelsize": 8,
+            "ytick.labelsize": 8,
+            "figure.titlesize": 8,
+            "font.size": 6,
+            "legend.fontsize": 6,
+        }
+    },
     # Optional keys (with default values)
     "panel_output": {
         "directory": str(output_dir / "panels"),
@@ -90,7 +101,7 @@ class DimPanelDemo(PanelBuilder):
         shared_text_args: dict[str, Any] = {
             "ha": "center",
             "va": "center",
-            "fontsize": self.config.font_sizes.axes_pt,
+            "fontsize": self.ax.xaxis.label.get_fontsize(),
         }
         self.fig.text(0.5, padding_rel_y, "width", **shared_text_args)
         self.fig.text(padding_rel_x, 0.5, "height", rotation=90, **shared_text_args)
@@ -124,7 +135,7 @@ class MarginPanelDemo(PanelBuilder):
         shared_text_args: dict[str, Any] = {
             "ha": "center",
             "va": "center",
-            "fontsize": self.config.font_sizes.axes_pt,
+            "fontsize": self.ax.xaxis.label.get_fontsize(),
         }
         self.fig.text(0.5, bottom_margin / 2, "bottom", **shared_text_args)
         self.fig.text(0.5, 1 - top_margin / 2, "top", **shared_text_args)

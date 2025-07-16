@@ -56,7 +56,6 @@ def test_from_dict_missing_required_keys(
     required_keys = [
         "panel_dimensions",
         "panel_margins",
-        "font_sizes"
     ]
     
     for key in required_keys:
@@ -226,7 +225,7 @@ def test_save_template_config_default_behavior(tmp_path: Path) -> None:
     # Verify required fields are present with TODO placeholders
     assert "panel_dimensions" in config_content
     assert "panel_margins" in config_content
-    assert "font_sizes" in config_content
+    assert "style" in config_content
     
     # Verify optional fields are present with default values
     assert "axes_separation" in config_content
@@ -260,10 +259,9 @@ def test_save_template_config_minimal_template(tmp_path: Path) -> None:
     
     config_content = content["panel_config"]
     
-    # Verify required fields are present
+    # Verify required fields are present  
     assert "panel_dimensions" in config_content
     assert "panel_margins" in config_content
-    assert "font_sizes" in config_content
     
     # Verify optional fields are not present (due to include_optional=False)
     assert "axes_separation" not in config_content

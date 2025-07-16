@@ -43,7 +43,7 @@ class FeatureManager:
         sep_cm = self.config.scalebar_config.separation_cm
         offset_cm = self.config.scalebar_config.offset_cm
         delta_text_cm = self.config.scalebar_config.text_offset_cm
-        font_size_pt = self.config.font_sizes.axes_pt
+        font_size_pt = float(ax.xaxis.label.get_fontsize())
 
         ax_bbox = ax.get_position()
         overlay_ax = mpl_helpers.create_full_figure_axes(fig)
@@ -93,7 +93,7 @@ class FeatureManager:
         sep_cm = self.config.scalebar_config.separation_cm
         offset_cm = self.config.scalebar_config.offset_cm
         delta_text_cm = self.config.scalebar_config.text_offset_cm
-        font_size_pt = self.config.font_sizes.axes_pt
+        font_size_pt = float(ax.yaxis.label.get_fontsize())
 
         ax_bbox = ax.get_position()
         overlay_ax = mpl_helpers.create_full_figure_axes(fig)
@@ -227,7 +227,8 @@ class FeatureManager:
         Raises:
             ValueError: If `loc` is not one of the allowed position keywords.
         """
-        font_size_pt = self.config.font_sizes.text_pt
+        import matplotlib.pyplot as plt
+        font_size_pt = float(plt.rcParams['font.size'])
         margin_cm = self.config.annotation_config.margin_cm
         delta_x = mpl_helpers.cm_to_axes_rel(ax, margin_cm, "width")
         delta_y = mpl_helpers.cm_to_axes_rel(ax, margin_cm, "height")

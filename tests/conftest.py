@@ -1,9 +1,9 @@
 from pathlib import Path
-from typing import TypeAlias
+from typing import Any, TypeAlias
 
 import pytest
 
-ConfigDict: TypeAlias = dict[str, dict[str, float | str | None]]
+ConfigDict: TypeAlias = dict[str, Any]
 
 
 @pytest.fixture
@@ -25,7 +25,18 @@ def sample_config_dict(tmp_path: Path) -> ConfigDict:
             "left_cm": 2.0, 
             "right_cm": 1.0
         },
-        "font_sizes": {"axes_pt": 12.0, "text_pt": 10.0},
+        "style": {
+            "theme": "default",
+            "rc_params": {
+                "axes.titlesize": 12.0,
+                "axes.labelsize": 12.0,
+                "xtick.labelsize": 12.0,
+                "ytick.labelsize": 12.0,
+                "figure.titlesize": 12.0,
+                "font.size": 10.0,
+                "legend.fontsize": 10.0,
+            }
+        },
         # Optional (has default values)
         "axes_separation": {"x_cm": 0.5, "y_cm": 1.0},
         "debug_panel": {"show": True, "grid_resolution_cm": 0.5},

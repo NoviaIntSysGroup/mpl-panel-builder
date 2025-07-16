@@ -11,7 +11,7 @@ from .types.axes import AxesSpacing, PanelMargins
 from .types.features import ColorBar, ScaleBar, TextAnnotation
 from .types.figure import DebugPanel, PanelDimensions
 from .types.output import PanelOutput
-from .types.styles import FontSizes, LineStyle
+from .types.styles import StyleConfig
 
 
 @dataclass(frozen=True)
@@ -25,9 +25,8 @@ class PanelConfig(FrozenConfigBase):
     Attributes:
         panel_dimensions: Overall panel dimensions in centimeters.
         panel_margins: Panel margin sizes in centimeters.
-        font_sizes: Font sizes for different figure elements in points.
+        style: Styling configuration with theme support and rcParams.
         axes_separation: Separation between adjacent axes in centimeters.
-        line_style: Line and marker styling configuration.
         scalebar_config: Scale bar configuration.
         colorbar_config: Color bar configuration.
         annotation_config: Annotation text configuration.
@@ -39,16 +38,15 @@ class PanelConfig(FrozenConfigBase):
         metadata={"description": "Overall panel dimensions"}
     )
     panel_margins: PanelMargins = field(metadata={"description": "Panel margin sizes"})
-    font_sizes: FontSizes = field(
-        metadata={"description": "Font sizes for different figure elements"}
+    style: StyleConfig = field(
+        default_factory=StyleConfig,
+        metadata={
+            "description": "Styling configuration with theme support and rcParams"
+        }
     )
     axes_separation: AxesSpacing = field(
         default_factory=AxesSpacing,
         metadata={"description": "Separation between adjacent axes"},
-    )
-    line_style: LineStyle = field(
-        default_factory=LineStyle,
-        metadata={"description": "Line and marker styling configuration"},
     )
     scalebar_config: ScaleBar = field(
         default_factory=ScaleBar,
