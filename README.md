@@ -11,13 +11,14 @@
 [![Unit Tests](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/tests.yml/badge.svg)](https://github.com/NoviaIntSysGroup/mpl-panel-builder/actions/workflows/tests.yml)
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
+[![PyPI version](https://badge.fury.io/py/mpl-panel-builder.svg)](https://badge.fury.io/py/mpl-panel-builder)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 </div>
 
 <div align="center">
 
-`mpl-panel-builder` helps you compose matplotlib-based publication-quality scientific figure panels with precise and repeatable layouts. The shared precise layout lets you align panels perfectly into complete figures by simply stacking them vertically or horizontally. Included example scripts emphasize both how to create panels and how these can be combined with TikZ to obtain a complete figure creation pipeline that is fully reproducible and under version control in Git. 
+`mpl-panel-builder` helps you compose matplotlib-based publication-quality scientific figure panels with precise and repeatable layouts. The shared precise layout lets you align panels perfectly into complete figures by simply stacking them vertically or horizontally. Included example scripts illustrate how to create panels and how these can be combined with TikZ to obtain a complete figure creation pipeline that is fully reproducible and under version control in Git. 
 
 </div>
 
@@ -28,7 +29,6 @@
 - 🔄 **Reproducible Workflow**: Version-controlled figure creation pipeline
 - 📊 **Flexible Panel Composition**: Easy vertical and horizontal stacking of panels
 - 🎯 **Publication-Ready**: Optimized for scientific publication requirements
-- 🔧 **Extensible**: Simple class-based architecture for custom panel types
 
 ## Requirements
 
@@ -60,91 +60,129 @@ $ cd mpl-panel-builder
 $ uv sync
 ```
 
-## Usage
+## Basic usage
 
-Panels are created by subclassing `PanelBuilder`, and by defining their size, margins and font sizes. A minimal example is given below:
+Panels are created using simple function calls. You first configure your panel with `mpb.configure(config_dict)` using a config dict specifying the panel's dimensions, margins, and styling (Matplotlib rcParams). Next, the styling is set via `mpb.set_style_rc()`, and the figure and axes are created via `mpb.create_panel()`. A minimal example is given below:
 
 ```python
-from mpl_panel_builder.panel_builder import PanelBuilder
+import matplotlib.pyplot as plt
+import mpl_panel_builder as mpb
 
-# 1. Define the configuration
-config = {
-    # Panel dimensions in centimeters
-    "panel_dimensions": {
-        "width_cm": 6.0,
-        "height_cm": 5.0,
+# mpl_panel_builder configuration
+mpb_config = {
+    "panel": {
+        "dimensions": {
+            "width_cm": 6.0,
+            "height_cm": 5.0,
+        },
+        "margins": {
+            "top_cm": 0.5,
+            "bottom_cm": 1.5,
+            "left_cm": 1.5,
+            "right_cm": 0.5,
+        },
     },
-    # Margins around the panel content (axes)
-    "panel_margins": {
-        "top_cm": 0.5,
-        "bottom_cm": 1.5,
-        "left_cm": 1.5,
-        "right_cm": 0.5,
-    },
-    # Font sizes in points
-    "font_sizes": {
-        "axes_pt": 8,
-        "text_pt": 6,
+    # Styling via rcParams
+    "style": {
+        "rc_params": {
+            "font.size": 8,
+        }
     }
 }
 
-# 2. Subclass PanelBuilder
-class MyPanel(PanelBuilder):
-    # Required class attributes
-    _panel_name = "my_panel"  # Unique identifier for the panel
-    _n_rows = 1               # Number of rows in the panel grid
-    _n_cols = 1               # Number of columns in the panel grid
+# Apply the config and style, and create your figure and axes
+mpb.configure(mpb_config)
+mpb.set_rc_style()
+fig, axs = mpb.create_panel(rows=1, cols=1)
+ax = axs[0][0]
 
-    def build_panel(self) -> None:
-        """Populate the panel with your content.
-        
-        This method is called automatically when calling the panel class instance.
-        Override this method to define your custom plotting logic.
-        """
-        # Access the single axis
-        ax = self.axs[0][0]
+# Add your plotting code here
+ax.plot([1, 2, 3], [1, 2, 3])
+ax.set_xlabel("X axis")
+ax.set_ylabel("Y axis")
 
-        # Add your plotting code here
-        ax.plot([1, 2, 3], [1, 2, 3])
-        ax.set_xlabel("X axis")
-        ax.set_ylabel("Y axis")
-
-# 3. Create and build the panel
-panel = MyPanel(config)
-fig = panel()  # This creates and returns the figure panel
+# Save the panel
+mpb.save_panel(fig, "my_panel")
 ```
 
-### Configuration Documentation
+### Configuration Options
 
-To explore all available configuration options, use the built-in documentation feature that provides a hierarchical overview of all configuration options, including required and optional fields with their descriptions, types, and default values.
+The configuration dict supports four main sections:
+
+- **`panel`**: Core settings for dimensions, margins, and axes separation.
+- **`style`**: Styling via rcParams.
+- **`features`**: Settings for additional features (e.g., scale bars and color bars).
+- **`output`**: Settings for saving panels (format and DPI).
+
+You can view all available configuration options by running:
 
 ```python
-from mpl_panel_builder.panel_builder_config import PanelBuilderConfig
+import mpl_panel_builder as mpb
 
-# Display all configuration keys with descriptions
-print(PanelBuilderConfig.describe_config())
+# Print template configuration to see all available options
+mpb.print_template_config()
 ```
 
-### Configuration Templates
+### Configuration Override
 
-For easier configuration management, you can generate YAML template files:
+For advanced configuration scenarios, the `configure()` function also supports special operators to modify the existing configuration:
 
 ```python
-from mpl_panel_builder.panel_builder_config import PanelBuilderConfig
+import mpl_panel_builder as mpb
 
-# Generate a complete template with all options
-PanelBuilderConfig.save_template_config("my_config.yaml")
+base_config = {
+    'panel': {
+        'dimensions': {'width_cm': 10, 'height_cm': 8},
+        'margins': {'left_cm': 1, 'right_cm': 1}
+    }
+}
+
+# Use special operators for relative updates
+updates = {
+    'panel': {
+        'dimensions': {'width_cm': '+=5'},     # Add 5 to current value
+        'margins': {'left_cm': '*1.5'}        # Multiply by 1.5
+    }
+}
+
+# First configure with base config
+mpb.configure(base_config)
+
+# Then apply updates using special operators
+mpb.configure(updates)
+# Result: width_cm becomes 15, left_cm becomes 1.5
 ```
 
-Load the template after editing:
+Supported operators:
+- `"+=X"`: Add X to current value
+- `"-=X"`: Subtract X from current value  
+- `"*X"`: Multiply current value by X
+- `"=X"`: Set value to X
+
+### Extra Features
+
+Extra features include wrappers for systematically aligning scale bars, colorbars, and annotations. In addition, the package includes a feature for placing a grid over the whole panel to verify that all elements have their intended position.
 
 ```python
-import yaml
+from mpl_panel_builder.features import (
+    draw_x_scale_bar, draw_y_scale_bar, 
+    add_colorbar, add_annotation, draw_gridlines
+)
 
-with open("my_config.yaml") as f:
-    config_dict = yaml.safe_load(f)["panel_config"]
-    
-config = PanelBuilderConfig.from_dict(config_dict)
+# Add scale bars
+draw_x_scale_bar(ax, length=1.0, label="1 cm")
+draw_y_scale_bar(ax, length=0.5, label="0.5 cm")
+
+# Add colorbar, mappable could e.g. be
+# mappable = ax.scatter()
+# mappable = ax.imshow()
+add_colorbar(ax, mappable, position="right")
+
+# Add annotations
+add_annotation(ax, "Text", loc="northwest")
+
+# Add debug gridlines
+draw_gridlines(fig)
 ```
 
 ## Examples
@@ -155,19 +193,26 @@ The repository includes example scripts that demonstrate both panel creation and
 
 ```bash
 # Create panels only
-python examples/ex_1_minimal_example/create_panels.py
+uv run python examples/ex_1_minimal_example/create_panels.py
 ```
 
 ### Example 2: Config key visualization
 
 ```bash
 # Create panels only
-python examples/ex_2_config_visualization/create_panels.py
+uv run python examples/ex_2_config_visualization/create_panels.py
 # Create complete figure, requires TikZ and Poppler
-python examples/ex_2_config_visualization/create_figure.py
+uv run python examples/ex_2_config_visualization/create_figure.py
 ```
 
 <img src="outputs/ex_2_config_visualization/figure.png" style="max-width: 500px; width: 100%; height: auto;" />  
+
+### Example 3: All features demonstration
+
+```bash
+# Create panels demonstrating all available features
+uv run python examples/ex_3_debug_all_features/create_panels.py
+```
 
 ## Repository layout
 

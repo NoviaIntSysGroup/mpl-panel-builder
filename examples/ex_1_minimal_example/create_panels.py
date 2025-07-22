@@ -1,76 +1,66 @@
-"""This example shows a minimal example of how to create a custom panel.
+"""This example shows a minimal example of how to create a panel using the new
+function-based API.
 
-The script defines the following subclass of :class:`PanelBuilder`:
-- MyPanel: 1 by 1 panel with a simple plot
+The script demonstrates:
+- Simple panel creation with mpb.create_panel()
+- Configuration using mpb.configure()
+- Saving panels with mpb.save_panel()
 """
 
-from __future__ import annotations
-
 from pathlib import Path
-from typing import Any
 
-from mpl_panel_builder import PanelBuilder
-from mpl_panel_builder.helpers import get_logger, setup_output_dir
+import matplotlib.pyplot as plt
+
+import mpl_panel_builder as mpb
+from mpl_panel_builder.helpers.examples import get_logger, get_repo_root
 
 # Simple setup
 example_name = Path(__file__).parent.name
-output_dir = setup_output_dir(example_name)
+output_dir = get_repo_root() / "outputs" / example_name
+output_dir.mkdir(parents=True, exist_ok=True)
 logger = get_logger(example_name)
 
-# 1. Define the configuration
-config: dict[str, Any] = {
-    # Panel dimensions in centimeters
-    "panel_dimensions": {
-        "width_cm": 6.0,
-        "height_cm": 5.0,
+# Panel configuration
+mpb_config = {
+    "panel": {
+        "dimensions": {
+            "width_cm": 6.0,
+            "height_cm": 5.0,
+        },
+        "margins": {
+            "top_cm": 0.5,
+            "bottom_cm": 1.5,
+            "left_cm": 1.5,
+            "right_cm": 0.5,
+        },
     },
-    # Margins around the panel content (axes)
-    "panel_margins": {
-        "top_cm": 0.5,
-        "bottom_cm": 1.5,
-        "left_cm": 1.5,
-        "right_cm": 0.5,
-    },
-    # Font sizes in points
-    "font_sizes": {
-        "axes_pt": 8,      # font size for axis labels and ticks
-        "text_pt": 6,      # font size for other text elements
-    },
-    # Optional keys (with default values)
-    "panel_output": {
-        "directory": str(output_dir / "panels"),
-        "format": "pdf",
+    "style": {
+        "rc_params": { 
+            "font.size": 8,
+        }
     },
 }
 
-# Create output directory if it doesn't exist
-(output_dir / "panels").mkdir(parents=True, exist_ok=True)
-
-# 2. Create a panel subclass
-class MyPanel(PanelBuilder):
-    # Required class attributes
-    _panel_name = "my_panel"  # Name of the panel
-    _n_rows = 1               # Number of rows in the panel grid
-    _n_cols = 1               # Number of columns in the panel grid
-
-    def build_panel(self) -> None:
-        """Populate the panel with your content.
-        
-        This method is called automatically when calling the panel class instance.
-        Override this method to define your custom plotting logic.
-        """
-        # Access the single axis
-        ax = self.axs[0][0]
-
-        # Add your plotting code here
-        ax.plot([1, 2, 3], [1, 2, 3])
-        ax.set_xlabel("X axis")
-        ax.set_ylabel("Y axis")
-
-
+# Create and populate the panel
 if __name__ == "__main__":
-    logger.info("Creating panel with class: %s", MyPanel.__name__)
-    builder = MyPanel(config)
-    fig = builder()
-    logger.info("Panel created and saved to %s", config["panel_output"]["directory"])
+    logger.info("Starting panel creation...")
     
+    # Set matplotlib styling and create the panel
+    mpb.configure(mpb_config)
+    mpb.set_rc_style()
+    fig, axs = mpb.create_panel(rows=1, cols=1)
+    
+    # Access the single axis
+    ax = axs[0][0]
+
+    # Add your plotting code here
+    ax.plot([1, 2, 3], [1, 2, 3])
+    ax.set_xlabel("X axis")
+    ax.set_ylabel("Y axis")
+    
+    # Save the panel
+    panel_path = output_dir / "panels" / "my_panel"
+    mpb.save_panel(fig, str(panel_path))
+    logger.info(f"Panel saved to: {panel_path.with_suffix('.pdf').resolve()}")
+    
+    plt.close(fig)

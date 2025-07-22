@@ -1,20 +1,23 @@
-"""MPL Panel Builder - Publication-quality scientific figure panels.
+"""MPL Panel Builder - Simplified function-based API."""
 
-Main Classes:
-    PanelBuilder: Abstract base for creating figure panels
-    PanelConfig: Configuration for panel layout and styling
-"""
+from . import features
+from .config import (
+    configure,
+    get_config,
+    print_template_config,
+    reset_config,
+)
+from .panel import create_panel, save_panel, set_rc_style
 
-# P TWO MAIN CLASSES P
-from .panel_builder import PanelBuilder
-from .panel_config import PanelConfig, override_config, types
+__version__ = "2.0.0"
 
 __all__ = [
-    # Main API
-    "PanelBuilder",     # P Create panels
-    "PanelConfig",      # P Configure panels
-    # Utilities
-    "override_config",
-    # Types module
-    "types",
+    'configure',
+    'create_panel',
+    'features',
+    'get_config',
+    'print_template_config',
+    'reset_config',
+    'save_panel',
+    'set_rc_style'
 ]

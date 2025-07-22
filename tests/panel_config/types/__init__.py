@@ -1,1 +1,0 @@
-"""Tests for panel_config types module."""

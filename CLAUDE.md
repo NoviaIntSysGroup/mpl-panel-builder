@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-`mpl-panel-builder` is a Python library for creating publication-quality scientific figure panels with matplotlib. It provides a class-based architecture for building panels with precise dimensions (in centimeters), consistent styling, and repeatable layouts that can be assembled into complete figures.
+`mpl-panel-builder` is a Python library for creating publication-quality scientific figure panels with matplotlib. It provides a simple function-based API for building panels with precise dimensions (in centimeters), consistent styling, and repeatable layouts that can be assembled into complete figures.
 
 ## Development Commands
 
@@ -48,33 +48,59 @@ uv run pre-commit install --hook-type pre-commit --hook-type pre-push
 
 ### Core Components
 
-- **`PanelBuilder`** (`src/mpl_panel_builder/panel_builder.py`): Abstract base class for creating panels. Subclasses must define `_panel_name`, `_n_rows`, `_n_cols` class attributes and implement `build_panel()` method.
+- **`configure()`** (`src/mpl_panel_builder/config.py`): Global configuration system using dictionaries. Supports deep merging and special override strings like "+=2", "*1.5".
 
-- **`PanelBuilderConfig`** (`src/mpl_panel_builder/panel_builder_config.py`): Immutable configuration system using frozen dataclasses with dot-access. Supports nested configurations and custom fields through `_extra` attribute.
+- **`create_panel()`** (`src/mpl_panel_builder/panel.py`): Creates matplotlib figure and axes grid with precise dimensions from global config.
 
-- **Configuration System**: Uses frozen dataclasses for type-safe, immutable configuration with automatic validation. Supports relative updates (e.g., "+=0.5", "*1.2") via `override_config()` function.
+- **`save_panel()`** (`src/mpl_panel_builder/panel.py`): Saves panels using output configuration settings.
+
+- **Features Module** (`src/mpl_panel_builder/features/`): Individual functions for scale bars, colorbars, annotations, and debug gridlines.
 
 ### Panel Creation Pattern
 
-1. Define configuration dictionary with required keys:
-   - `panel_dimensions_cm`: Panel size in centimeters
-   - `panel_margins_cm`: Margins around plot area  
-   - `font_sizes_pt`: Font sizes for axes and text
+1. Configure the package with `configure(config_dict)`:
+   - `panel`: Dimensions, margins, and axes separation
+   - `style`: Theme and matplotlib rcParams
+   - `features`: Settings for individual features
+   - `output`: Directory, format, and DPI
 
-2. Subclass `PanelBuilder` with required class attributes:
-   - `_panel_name`: Unique panel identifier
-   - `_n_rows`, `_n_cols`: Grid dimensions
+2. Set rcParams with `set_rc_style()` and create panels with `create_panel(rows, cols)`
 
-3. Implement `build_panel()` method with plotting logic
+3. Add plotting code and features as needed
 
-4. Instantiate and call panel class to generate figure
+4. Save with `save_panel(fig, name)`
+
+### Styling Architecture
+
+The styling system uses global configuration:
+
+- **Theme Support**: Built-in 'article' and 'none' themes
+- **rcParams Override**: User rcParams merge with theme defaults
+- **Global Style Setting**: Use `set_rc_style()` to apply rcParams globally
+
+### Complete API Reference
+
+**Configuration Functions:**
+- **`configure(config_dict)`**: Apply configuration dictionary with deep merging and special operators
+- **`get_config()`**: Retrieve current configuration dictionary
+- **`reset_config()`**: Reset to default configuration
+- **`print_template_config()`**: Print default config template to stdout (safer than file operations)
+
+**Panel Functions:**
+- **`create_panel(rows=1, cols=1)`**: Create figure and axes grid using global config
+- **`save_panel(fig, filepath)`**: Save panel using output configuration
+- **`set_rc_style()`**: Apply rcParams globally from style configuration
+
+**Features Module:**
+- Import individual functions as needed: `from mpl_panel_builder.features import draw_x_scale_bar, add_colorbar, add_annotation, draw_gridlines`
 
 ### Key Features
 
 - **Precise Layout**: All dimensions specified in centimeters for exact sizing
-- **Style Management**: Consistent matplotlib rcParams applied via context manager
-- **Scale Bars**: Built-in support for scale bars with `draw_scale_bar()` method
-- **Debug Mode**: Grid overlay for layout debugging via `debug_panel.show` config
+- **Simple API**: No subclassing - just function calls
+- **Modular Features**: Import only what you need from `features` module
+- **Global Configuration**: Easy to configure once and reuse
+- **Template Output**: View configuration options with `print_template_config()`
 - **Flexible Output**: Configurable output directory, format, and DPI
 
 ## Testing

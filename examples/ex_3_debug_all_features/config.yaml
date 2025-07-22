@@ -1,41 +1,43 @@
-figures:
-  # Required fields
-  panel_dimensions: 
+panel:
+  dimensions: 
     width_cm: 11 
     height_cm: 11
-  panel_margins:
+  margins:
     left_cm: 1.5
     bottom_cm: 1.5
     right_cm: 0.5
     top_cm: 0.5
-  font_sizes: 
-    axes_pt: 8
-    text_pt: 6
-  # Optional fields
   axes_separation: 
     x_cm: 1.0
     y_cm: 1.0
-  line_style:
-    line_width_pt: 3.0
-    marker_size_pt: 4.0
-  scalebar_config: 
+style:
+  theme: "none"
+  rc_params:
+    # Font sizes
+    axes.titlesize: 8
+    axes.labelsize: 8
+    xtick.labelsize: 8
+    ytick.labelsize: 8
+    figure.titlesize: 8
+    font.size: 6
+    legend.fontsize: 6
+    # Line and marker styles
+    lines.linewidth: 3.0
+    lines.markersize: 4.0
+    # Axes properties (makes the debug lines visible)
+    axes.facecolor: "none"
+features:
+  scalebar: 
     separation_cm: 0.5
     offset_cm: 0.5
     text_offset_cm: 0.5
-  colorbar_config: 
+  colorbar: 
     width_cm: 0.5
     separation_cm: 0.5
-  description_config: 
+  annotation: 
     margin_cm: 0.5
-  panel_output: 
-    directory: "output"
-    format: "pdf"
-    dpi: 600
-  debug_panel: 
-    show: True
-    grid_resolution_cm: 0.5
-  # Custom fields
-  colors:
-    color_1: [0.8500, 0.3250, 0.0980]  # reddish-orange
-    color_2: [0.0980, 0.8500, 0.3250]  # complementary greenish
-    color_3: [0.3250, 0.0980, 0.8500]  # complementary bluish
+  gridlines: 
+    resolution_cm: 0.5
+output: 
+  format: "pdf"
+  dpi: 600

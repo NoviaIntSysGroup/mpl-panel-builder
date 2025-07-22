@@ -10,7 +10,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from mpl_panel_builder.helpers import get_logger, setup_output_dir
+from mpl_panel_builder.helpers.examples import get_logger, setup_output_dir
 
 # Simple setup
 example_name = Path(__file__).parent.name
@@ -118,7 +118,7 @@ def main() -> None:
             [
                 "pdftoppm",
                 "-png",
-                "-r", "600",
+                "-r", "300",
                 str(pdf_dest),
                 str(png_output.with_suffix(""))
             ],

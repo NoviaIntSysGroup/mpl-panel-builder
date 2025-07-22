@@ -2,7 +2,8 @@
 
 \input{../tikz_settings.tex}
 
-\newcommand{\vSep}{5mm}
+\newcommand{\vSep}{1mm}
+\newcommand{\hSep}{5mm}
 % Define the example name here
 \def\exampleName{ex_2_config_visualization}
 
@@ -11,16 +12,16 @@
 
 % Panels
 \node[panel] (a) {\includegraphics[]{"../../outputs/\exampleName/panels/dim_panel"}};
-\node[panel, anchor=west](b) at (a.east) {\includegraphics[]{"../../outputs/\exampleName/panels/margin_panel"}};
-\node[panel, anchor=west](c) at (b.east) {\includegraphics[]{"../../outputs/\exampleName/panels/font_size_panel"}};
+\node[panel, anchor=west, xshift=\hSep](b) at (a.east) {\includegraphics[]{"../../outputs/\exampleName/panels/margin_panel"}};
+\node[panel, anchor=west, xshift=\hSep](c) at (b.east) {\includegraphics[]{"../../outputs/\exampleName/panels/axes_separation_panel"}};
 
 % Keys
-\foreach \n/\t in {a/panel\_dimensions\_cm, b/panel\_margins\_cm, c/font\_sizes\_pt} {
-    \node[headingNode, anchor=south, yshift=0] at (\n.north) {\headingSize\t};
+\foreach \n/\t in {a/dimensions, b/margins, c/axes\_separation} {
+    \node[headingNode, anchor=south, yshift=\vSep] at (\n.north) {\headingSize\t};
 }
 
 % Heading
-\node[headingNode, anchor=south, yshift=\vSep] (h1) at (b.north) {\figHeading{Config dict keys visually explained}};
+\node[headingNode, anchor=south, yshift=6*\vSep] (h1) at (b.north) {\figHeading{Panel config keys visually explained}};
 \draw[lineShort] (h1.west) -- (h1-|a.west);
 \draw[lineShort] (h1.east) -- (h1-|c.east);	
 
