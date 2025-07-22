@@ -93,8 +93,8 @@ def create_dim_panel() -> None:
     padding_rel_x = cm_to_fig_rel(fig, margin / 2, "width")
     padding_rel_y = cm_to_fig_rel(fig, margin / 2, "height")
 
-    fig.text(0.5, padding_rel_y, "width", ha="center", va="center")
-    fig.text(padding_rel_x, 0.5, "height", rotation=90, ha="center", va="center")
+    fig.text(0.5, padding_rel_y, "width_cm", ha="center", va="center")
+    fig.text(padding_rel_x, 0.5, "height_cm", rotation=90, ha="center", va="center")
 
     panel_path = output_dir / "panels" / "dim_panel"
     mpb.save_panel(fig, str(panel_path))
@@ -136,13 +136,13 @@ def create_margin_panel() -> None:
         [0, 1], [1 - top_margin_rel, 1 - top_margin_rel], ":", color=config_color
     )
 
-    fig.text(0.5, bottom_margin_rel / 2, "bottom", ha="center", va="center")
-    fig.text(0.5, 1 - top_margin_rel / 2, "top", ha="center", va="center")
-    fig.text(left_margin_rel / 2, 0.5, "left", rotation=90, ha="center", va="center")
+    fig.text(0.5, bottom_margin_rel / 2, "bottom_cm", ha="center", va="center")
+    fig.text(0.5, 1 - top_margin_rel / 2, "top_cm", ha="center", va="center")
+    fig.text(left_margin_rel / 2, 0.5, "left_cm", rotation=90, ha="center", va="center")
     fig.text(
         1 - right_margin_rel / 2,
         0.5,
-        "right",
+        "right_cm",
         rotation=90,
         ha="center",
         va="center",

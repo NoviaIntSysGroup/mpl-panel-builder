@@ -23,9 +23,9 @@ def draw_x_scale_bar(ax: Axes, length: float, label: str) -> None:
     config = get_config()
     scalebar_config = config['features']['scalebar']
     
-    # Get font size from axes and line width from axis spines
+    # Get font size from axes and line width from config
     font_size_pt = float(ax.xaxis.label.get_fontsize())
-    linewidth = ax.spines['bottom'].get_linewidth()
+    linewidth_pt = scalebar_config['line_width_pt']
     
     # Get axes position in figure coordinates
     ax_bbox = ax.get_position()
@@ -48,7 +48,7 @@ def draw_x_scale_bar(ax: Axes, length: float, label: str) -> None:
 
     # Draw scale bar
     overlay_ax.plot(
-        [x_rel, x_rel + length_rel], [y_rel, y_rel], "k-", linewidth=linewidth
+        [x_rel, x_rel + length_rel], [y_rel, y_rel], "k-", linewidth=linewidth_pt
     )
     
     # Add label
@@ -78,9 +78,9 @@ def draw_y_scale_bar(ax: Axes, length: float, label: str) -> None:
     config = get_config()
     scalebar_config = config['features']['scalebar']
     
-    # Get font size from axes and line width from axis spines
+    # Get font size from axes and line width from config
     font_size_pt = float(ax.yaxis.label.get_fontsize())
-    linewidth = ax.spines['left'].get_linewidth()
+    linewidth_pt = scalebar_config['line_width_pt']
     
     # Get axes position in figure coordinates
     ax_bbox = ax.get_position()
@@ -108,7 +108,7 @@ def draw_y_scale_bar(ax: Axes, length: float, label: str) -> None:
 
     # Draw scale bar
     overlay_ax.plot(
-        [x_rel, x_rel], [y_rel, y_rel + length_rel], "k-", linewidth=linewidth
+        [x_rel, x_rel], [y_rel, y_rel + length_rel], "k-", linewidth=linewidth_pt
     )
     
     # Add label

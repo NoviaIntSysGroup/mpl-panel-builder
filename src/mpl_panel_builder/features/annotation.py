@@ -1,5 +1,6 @@
 """Annotation functionality."""
 
+import matplotlib as mpl
 from matplotlib.axes import Axes
 
 from ..config import get_config
@@ -34,7 +35,7 @@ def add_annotation(
     annotation_config = config['features']['annotation']
     
     # Get font size from global config
-    font_size_pt = config['style']['rc_params'].get('font.size', 8)
+    font_size_pt = mpl.rcParams['font.size']
     
     # Calculate margins with ascender correction for south positions
     margin_cm = annotation_config['margin_cm']

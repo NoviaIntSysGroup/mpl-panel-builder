@@ -31,6 +31,7 @@ class ScalebarConfig(TypedDict):
     separation_cm: float
     offset_cm: float
     text_offset_cm: float
+    line_width_pt: float
 
 class ColorbarConfig(TypedDict):
     width_cm: float
@@ -67,12 +68,13 @@ _default_config = {
     },
     'style': {
         'theme': 'none',
-        'rc_params': {
-            'font.size': 8,
-        }
+        'rc_params': {}
     },
     'features': {
-        'scalebar': {'separation_cm': 0.2, 'offset_cm': 0.2, 'text_offset_cm': 0.1},
+        'scalebar': {
+            'separation_cm': 0.2, 'offset_cm': 0.2, 'text_offset_cm': 0.1,
+            'line_width_pt': 1.5
+        },
         'colorbar': {'width_cm': 0.3, 'separation_cm': 0.2},
         'annotation': {'margin_cm': 0.2},
         'gridlines': {'resolution_cm': 0.5}
@@ -183,6 +185,8 @@ def _merge_config(base: dict[str, Any], updates: dict[str, Any]) -> Config:
 
             if key in ["rc_params"]:
                 # Special handling: merge rc_params without validation
+                # as we don't want to specify every possible rc_param
+                # and since rcParams validate keys at runtime.
                 result[key].update(val)
             elif isinstance(val, dict) and isinstance(result[key], dict):
                 result[key] = _recursive_merge(result[key], val)

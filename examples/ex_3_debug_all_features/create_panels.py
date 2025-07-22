@@ -79,7 +79,10 @@ def create_debug_panel() -> None:
     
     # Create the panel
     logger.info("Creating debug panel...")
-    mpb.configure_from_yaml(str(current_dir / "config.yaml"))
+    import yaml
+    with open(current_dir / "config.yaml") as f:
+        config = yaml.safe_load(f)
+    mpb.configure(config)
     mpb.set_rc_style()
     fig, axs = mpb.create_panel(rows=2, cols=2)
         

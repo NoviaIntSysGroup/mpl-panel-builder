@@ -31,6 +31,7 @@ features:
     separation_cm: 0.5
     offset_cm: 0.5
     text_offset_cm: 0.5
+    line_width_pt: 1.5
   colorbar: 
     width_cm: 0.5
     separation_cm: 0.5

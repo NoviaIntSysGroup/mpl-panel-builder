@@ -11,6 +11,9 @@
 *.xls
 *.mat
 
+# External configurations
+.claude
+
 # Pickle files
 *.pkl
 
@@ -45,9 +48,6 @@ __pycache__/
 
 # ruff
 .ruff_cache
-
-# mypy
-.mypy_cache
 
 # LaTeX
 *.aux

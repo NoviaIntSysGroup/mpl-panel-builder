@@ -125,7 +125,7 @@ def set_rc_style() -> None:
     style_config = config['style']
     
     # Validate theme
-    valid_themes = {'article', 'none'}
+    valid_themes = {'article', 'none', 'presentation'}
     theme = style_config['theme']
     if theme not in valid_themes:
         valid_themes_str = ', '.join(sorted(valid_themes))
@@ -147,6 +147,26 @@ def set_rc_style() -> None:
             # Line and marker styles
             "lines.linewidth": 1,
             "lines.markersize": 4,
+            # Axes appearance
+            'axes.facecolor': 'white',
+            "axes.spines.right": False,
+            "axes.spines.top": False,
+            # Legend appearance
+            "legend.frameon": True,
+            "legend.framealpha": 0.6,
+            "legend.edgecolor": 'none',
+            "legend.handlelength": 1.0,
+            "legend.handletextpad": 0.7,
+            "legend.labelspacing": 0.4,
+            "legend.columnspacing": 1.0,
+        }
+    elif theme == 'presentation':
+        rc_params = {
+            # Font settings
+            "font.size": 12,
+            # Line and marker styles
+            "lines.linewidth": 2,
+            "lines.markersize": 5,
             # Axes appearance
             'axes.facecolor': 'white',
             "axes.spines.right": False,
