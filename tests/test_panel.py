@@ -76,3 +76,16 @@ def test_set_rc_style_invalid_theme() -> None:
     
     with pytest.raises(ValueError, match="Unknown theme 'invalid_theme'"):
         mpb.set_rc_style()
+
+
+def test_create_stacked_panel() -> None:
+    """Test stacked panel creation."""
+    mpb.reset_config()
+    
+    mpb.set_rc_style()
+    fig, axs = mpb.create_stacked_panel(rows=2, cols=2)
+    
+    assert fig is not None
+    assert len(axs) == 2
+    assert len(axs[0]) == 2
+    assert len(axs[1]) == 2

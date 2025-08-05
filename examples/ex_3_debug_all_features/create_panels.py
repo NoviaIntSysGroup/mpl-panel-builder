@@ -100,6 +100,8 @@ def create_debug_panel() -> None:
     add_annotation(ax, "NE", loc="northeast", bg_color="lightgrey")
     add_annotation(ax, "SW", loc="southwest", bg_color="lightgrey")
     add_annotation(ax, "SE", loc="southeast", bg_color="lightgrey")
+    # Test label
+    mpb.features.add_label(ax, "a")
 
     # Top right
     ax = axs[0][1]
@@ -120,6 +122,8 @@ def create_debug_panel() -> None:
         cbar.outline.set_visible(False) # type: ignore
         # Remove tick lines
         cbar.ax.tick_params(length=0)
+    # Test label
+    mpb.features.add_label(ax, "B")
 
     # Bottom left
     ax = axs[1][0]
@@ -130,6 +134,8 @@ def create_debug_panel() -> None:
         xticks=[0, 1, 2, 3, 4],
         yticks=[0, 1, 2, 3, 4],
     )
+    # Test label
+    mpb.features.add_label(ax, "C")
 
     # Bottom right
     ax = axs[1][1]
@@ -140,7 +146,9 @@ def create_debug_panel() -> None:
     )
     # Test x scale bar
     draw_x_scale_bar(ax, 1, "1 cm")
-    
+    # Test label
+    mpb.features.add_label(ax, "D")
+
     # Add debug gridlines
     draw_gridlines(fig)
     

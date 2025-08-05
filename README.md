@@ -93,7 +93,7 @@ mpb_config = {
 # Apply the config and style, and create your figure and axes
 mpb.configure(mpb_config)
 mpb.set_rc_style()
-fig, axs = mpb.create_panel(rows=1, cols=1)
+fig, axs = mpb.create_panel(rows=1, cols=1)  # or mpb.create_stacked_panel(rows=1, cols=1)
 ax = axs[0][0]
 
 # Add your plotting code here
@@ -166,7 +166,7 @@ Extra features include wrappers for systematically aligning scale bars, colorbar
 ```python
 from mpl_panel_builder.features import (
     draw_x_scale_bar, draw_y_scale_bar, 
-    add_colorbar, add_annotation, draw_gridlines
+    add_colorbar, add_annotation, add_label, draw_gridlines
 )
 
 # Add scale bars
@@ -180,6 +180,9 @@ add_colorbar(ax, mappable, position="right")
 
 # Add annotations
 add_annotation(ax, "Text", loc="northwest")
+
+# Add labels
+add_label(ax, "a")
 
 # Add debug gridlines
 draw_gridlines(fig)

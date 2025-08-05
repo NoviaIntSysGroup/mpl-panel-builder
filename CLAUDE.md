@@ -52,9 +52,11 @@ uv run pre-commit install --hook-type pre-commit --hook-type pre-push
 
 - **`create_panel()`** (`src/mpl_panel_builder/panel.py`): Creates matplotlib figure and axes grid with precise dimensions from global config.
 
+- **`create_stacked_panel()`** (`src/mpl_panel_builder/panel.py`): Creates matplotlib figure and axes grid with spacing that mimics stacked separate panels.
+
 - **`save_panel()`** (`src/mpl_panel_builder/panel.py`): Saves panels using output configuration settings.
 
-- **Features Module** (`src/mpl_panel_builder/features/`): Individual functions for scale bars, colorbars, annotations, and debug gridlines.
+- **Features Module** (`src/mpl_panel_builder/features/`): Individual functions for scale bars, colorbars, annotations, labels, and debug gridlines.
 
 ### Panel Creation Pattern
 
@@ -88,11 +90,12 @@ The styling system uses global configuration:
 
 **Panel Functions:**
 - **`create_panel(rows=1, cols=1)`**: Create figure and axes grid using global config
+- **`create_stacked_panel(rows=1, cols=1)`**: Create figure and axes grid with stacked spacing
 - **`save_panel(fig, filepath)`**: Save panel using output configuration
 - **`set_rc_style()`**: Apply rcParams globally from style configuration
 
 **Features Module:**
-- Import individual functions as needed: `from mpl_panel_builder.features import draw_x_scale_bar, add_colorbar, add_annotation, draw_gridlines`
+- Import individual functions as needed: `from mpl_panel_builder.features import draw_x_scale_bar, add_colorbar, add_annotation, add_label, draw_gridlines`
 
 ### Key Features
 

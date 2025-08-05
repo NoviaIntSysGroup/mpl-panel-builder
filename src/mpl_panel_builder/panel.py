@@ -68,6 +68,43 @@ def create_panel(rows: int = 1, cols: int = 1) -> tuple[Figure, list[list[Axes]]
     
     return fig, axs
 
+def create_stacked_panel(
+    rows: int = 1, cols: int = 1
+) -> tuple[Figure, list[list[Axes]]]:
+    """Creates figure and axes grid with stacked spacing using global config.
+    
+    Temporarily overrides axes_separation to create the visual appearance of 
+    separate panels stacked together - horizontal separation = left_cm + right_cm, 
+    vertical separation = top_cm + bottom_cm.
+    
+    Args:
+        rows: Number of rows in axes grid
+        cols: Number of columns in axes grid
+        
+    Returns:
+        Tuple of (figure, axes_grid)
+    """
+    config = get_config()
+    margins = config['panel']['margins']
+    
+    # Calculate stacked separations from margins
+    stacked_x_cm = margins['left_cm'] + margins['right_cm']
+    stacked_y_cm = margins['top_cm'] + margins['bottom_cm']
+    
+    # Save original axes_separation
+    original_axes_sep = config['panel']['axes_separation'].copy()
+    
+    # Temporarily override axes_separation
+    config['panel']['axes_separation']['x_cm'] = stacked_x_cm
+    config['panel']['axes_separation']['y_cm'] = stacked_y_cm
+    
+    try:
+        # Use existing create_panel function
+        return create_panel(rows, cols)
+    finally:
+        # Restore original axes_separation
+        config['panel']['axes_separation'] = original_axes_sep
+
 def save_panel(fig: Figure, filepath: str) -> None:
     """Saves panel using global config.
     

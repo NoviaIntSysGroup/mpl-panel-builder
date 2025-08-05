@@ -40,6 +40,15 @@ class ColorbarConfig(TypedDict):
 class AnnotationConfig(TypedDict):
     margin_cm: float
 
+class LabelConfig(TypedDict):
+    x_cm: float
+    y_cm: float
+    bold: bool
+    caps: bool
+    prefix: str
+    suffix: str
+    fontsize_pt: float
+
 class GridlinesConfig(TypedDict):
     resolution_cm: float
 
@@ -47,6 +56,7 @@ class FeaturesConfig(TypedDict):
     scalebar: ScalebarConfig
     colorbar: ColorbarConfig
     annotation: AnnotationConfig
+    label: LabelConfig
     gridlines: GridlinesConfig
 
 class OutputConfig(TypedDict):
@@ -77,6 +87,10 @@ _default_config = {
         },
         'colorbar': {'width_cm': 0.3, 'separation_cm': 0.2},
         'annotation': {'margin_cm': 0.2},
+        'label': {
+            'x_cm': 0.5, 'y_cm': 0.5, 'bold': True, 'caps': True,
+            'prefix': '', 'suffix': '', 'fontsize_pt': 10
+        },
         'gridlines': {'resolution_cm': 0.5}
     },
     'output': {
